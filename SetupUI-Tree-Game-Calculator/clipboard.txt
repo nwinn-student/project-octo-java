@@ -1,0 +1,1 @@
+Panel[,565,210,85x85,invalid,alignmentX=0.0,alignmentY=0.0,border=javax.swing.border.LineBorder@45319b09,flags=16777225,maximumSize=java.awt.Dimension[width=5000,height=5000],minimumSize=java.awt.Dimension[width=25,height=25],preferredSize=java.awt.Dimension[width=50,height=50]]

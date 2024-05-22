@@ -1,0 +1,408 @@
+Region 0:
+1:	Minotaur
+2:	Lamian-Pheres
+3:	Harpies
+4:	Hobgoblin
+5:	Cyclopes
+6:	Spartae
+
+Region 1:
+1:	Wraith
+2:	Taraxippi
+3:	Keres
+4:	Undead
+5:	Hydra
+6:	Pegasus
+
+Region 2:
+1:	Hieracosphinx
+2:	Panes
+3:	Gegenees
+4:	Gorgons
+5:	Briareus
+6:	Merpeople
+
+Region 3:
+1:	Eidolon
+2:	Dracaenae
+3:	Cetus
+4:	Laestrygonians
+5:	Androsphinx
+6:	Giants
+
+Region 4:
+1:	Kobaloi
+2:	Therianthropes
+3:	Cetea
+4:	Drakon
+5:	Pegasus
+6:	Spartae
+
+Region 5:
+1:	Centaurs
+2:	Crocotta
+3:	Briareus
+4:	Cetus
+5:	Hippalectryon
+6:	Lamian-Pheres
+
+Region 6:
+1:	Ichthyocentaurs
+2:	Odontotyrannos
+3:	Stymphalian-Birds
+4:	Empousa
+5:	Ghoul
+6:	Harpies
+
+Region 7:
+1:	Laestrygonians
+2:	Charybdis
+3:	Cetea
+4:	Dracaenae
+5:	Gorgons
+6:	Spartae
+
+Region 8:
+1:	Scythian-Dracanae
+2:	Celestial
+3:	Giants
+4:	Cerastes
+5:	Ghoul
+6:	Ouroboros
+
+Region 9:
+1:	Skolopendra
+2:	Chimera
+3:	Corithian-Lamia
+4:	Cyclopes
+5:	Harpies
+6:	Lion-Headed-Giants
+
+Region 10:
+1:	Ophiotaurus
+2:	Lycanthrope
+3:	Lamia
+4:	Aeternae
+5:	Ouroboros
+6:	Ogres
+
+Region 11:
+1:	Panes
+2:	Panes
+3:	Ipotane
+4:	Briareus
+5:	Briareus
+6:	Mormolykeia
+
+Region 12:
+1:	Trolls
+2:	Typhon
+3:	Giants
+4:	Mormolykeia
+5:	Ichthyocentaurs
+6:	Ouroboros
+
+Region 13:
+1:	Unicors
+2:	Skeleton
+3:	Damysus
+4:	Keres
+5:	Ant-Horn
+6:	Ichthyocentaurs
+
+Region 14:
+1:	Winged-Centaurs
+2:	Lycanthrope
+3:	Argus
+4:	Dryad
+5:	Ouroboros
+6:	Briareus
+
+Region 15:
+1:	Androsphinx
+2:	Spartae
+3:	Titan
+4:	Geryon
+5:	Dryad
+6:	Celestial
+
+Region 16:
+1:	Damysus
+2:	Briareus
+3:	Nymph
+4:	Ichthyocentaurs
+5:	Lamian-Pheres
+6:	Ant-Horn
+
+Region 17:
+1:	Lernaean-Hydra
+2:	Nymph
+3:	Merpeople
+4:	Vampire
+5:	Ant-Horn
+6:	Undead
+
+Region 18:
+1:	Lion-Headed-Giants
+2:	Orc
+3:	Eidolon
+4:	Orc
+5:	Vampire
+6:	Laestrygonians
+
+Region 19:
+1:	Kobaloi
+2:	Mormolykeia
+3:	Taraxippi
+4:	Drakon
+5:	Onocentaur
+6:	Hydra
+
+Region 20:
+1:	Aeternae
+2:	Catoblepas
+3:	Cyprian-Centaurs
+4:	Aeternae
+5:	Cerastes
+6:	Chimera
+
+Region 21:
+1:	Ophiotaurus
+2:	Harpies
+3:	Basilisk
+4:	Aeternae
+5:	Spartae
+6:	Centaurs
+
+Region 22:
+1:	Dragon
+2:	Laestrygonians
+3:	Keres
+4:	Scythian-Dracanae
+5:	Dracaenae
+6:	Pegasus
+
+Region 23:
+1:	Phoenix
+2:	Harpies
+3:	Harpies
+4:	Centaurs
+5:	Spartae
+6:	Spartae
+
+Region 24:
+1:	Corithian-Lamia
+2:	Merpeople
+3:	Ophiotaurus
+4:	Lion-Headed-Giants
+5:	Undead
+6:	Aeternae
+
+Region 25:
+1:	Aeternae
+2:	Slime
+3:	Cyprian-Centaurs
+4:	Aeternae
+5:	Orc
+6:	Chimera
+
+Region 26:
+1:	Drakon
+2:	Sphinx
+3:	Ipotane
+4:	Sirens
+5:	Empusa
+6:	Mormolykeia
+
+Region 27:
+1:	Pegasus
+2:	Crocotta
+3:	Lion-Headed-Giants
+4:	Phoenix
+5:	Hippalectryon
+6:	Orc
+
+Region 28:
+1:	Sea-Goats
+2:	Therianthropes
+3:	Aeternae
+4:	Cetus
+5:	Pegasus
+6:	Aeternae
+
+Region 29:
+1:	Merpeople
+2:	Damysus
+3:	Argus
+4:	Undead
+5:	Ichthyocentaurs
+6:	Briareus
+
+Region 30:
+1:	Lamian-Pheres
+2:	Lycanthrope
+3:	Cetea
+4:	Cyclopes
+5:	Ouroboros
+6:	Spartae
+
+Region 31:
+1:	Titan
+2:	Ichthyocentaurs
+3:	Onocentaur
+4:	Celestial
+5:	Empousa
+6:	Celestial
+
+Region 32:
+1:	Geryon
+2:	Drakon
+3:	Onocentaur
+4:	Nymph
+5:	Sirens
+6:	Celestial
+
+Region 33:
+1:	Corithian-Lamia
+2:	Gegenees
+3:	Lamia
+4:	Lion-Headed-Giants
+5:	Merpeople
+6:	Ogres
+
+Region 34:
+1:	Hieracosphinx
+2:	Androsphinx
+3:	Hippocampus
+4:	Gorgons
+5:	Geryon
+6:	Tarandos
+
+Region 35:
+1:	Hippalectryon
+2:	Drakon
+3:	Merpeople
+4:	Hieracosphinx
+5:	Sirens
+6:	Undead
+
+Region 36:
+1:	Vampire
+2:	Typhon
+3:	Charybdis
+4:	Laestrygonians
+5:	Ichthyocentaurs
+6:	Gorgons
+
+Region 37:
+1:	Minotaur
+2:	Gegenees
+3:	Gryphon
+4:	Hobgoblin
+5:	Merpeople
+6:	Sirens
+
+Region 38:
+1:	Ophiotaurus
+2:	Empousa
+3:	Dragon
+4:	Aeternae
+5:	Merpeople
+6:	Scythian-Dracanae
+
+Region 39:
+1:	Laestrygonians
+2:	Skolopendra
+3:	Lamia
+4:	Dracaenae
+5:	Cyclopes
+6:	Nymph
+
+Region 40:
+1:	Hieracosphinx
+2:	Keres
+3:	Odontotyrannos
+4:	Gorgons
+5:	Pegasus
+6:	Ghoul
+
+Region 41:
+1:	Lamia
+2:	Lamia
+3:	Giants
+4:	Nymph
+5:	Ogres
+6:	Ouroboros
+
+Region 42:
+1:	Scythian-Dracanae
+2:	Crocotta
+3:	Stymphalian-Birds
+4:	Cerastes
+5:	Hippalectryon
+6:	Harpies
+
+Region 43:
+1:	Gigantes
+2:	Taraxippi
+3:	Gegenees
+4:	Phoenix
+5:	Hydra
+6:	Merpeople
+
+Region 44:
+1:	Onocentaur
+2:	Eidolon
+3:	Skolopendra
+4:	Celestial
+5:	Laestrygonians
+6:	Cyclopes
+
+Region 45:
+1:	Drakon
+2:	Hippocampus
+3:	Amphisbaena
+4:	Sirens
+5:	Tarandos
+6:	Argus
+
+Region 46:
+1:	Empousa
+2:	Kobaloi
+3:	Taraxippi
+4:	Merpeople
+5:	Drakon
+6:	Hydra
+
+Region 47:
+1:	Nymph
+2:	Skolopendra
+3:	Hieracosphinx
+4:	Ant-Horn
+5:	Cyclopes
+6:	Gorgons
+
+Region 48:
+1:	Lamia
+2:	Charybdis
+3:	Nymph
+4:	Ogres
+5:	Gorgons
+6:	Ant-Horn
+
+Region 49:
+1:	Gegenees
+2:	Empusa
+3:	Goblin
+4:	Merpeople
+5:	Lion-Headed-Giants
+6:	Empousa
+
+Region 50:
+1:	Ant-Horn
+2:	Chimera
+3:	Pegasus
+4:	Trolls
+5:	Harpies
+6:	Phoenix
+
