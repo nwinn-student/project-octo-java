@@ -18,10 +18,10 @@ import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 
 /**
- * Displays a graphical representation of the formulas presented within <code>Formula</code>.
+ * Write a description of class GroupSelector here.
  *
  * @author Noah Winn
- * @version 6/25/2023
+ * @version 5/23/2024
  */
 
 

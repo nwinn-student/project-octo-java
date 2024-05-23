@@ -19,10 +19,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JPopupMenu;
 
 /**
- * Displays a graphical representation of the formulas presented within <code>Formula</code>.
+ * Write a description of class Connector here.
  *
  * @author Noah Winn
- * @version 6/25/2023
+ * @version 5/22/2024
  */
 
 
@@ -90,7 +90,16 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         }
         //this.setBounds(height, width, 5,5);
         select.repaint();
-        this.repaint();
+        //this.repaint();
+    }
+    public void removeConnections(){
+        if(panHori != null){
+            select.remove(panHori);
+        }
+        if(panVert != null){
+            select.remove(panVert);
+        }
+        select.repaint();
     }
     /**
      * Zooms in and out in accordance with mouse scroll wheel
@@ -103,8 +112,11 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
                 
         myX = getX();
         myY = getY();
-        panVert = new JPanel();
-        panHori = new JPanel();
+        if(panVert == null){
+            panVert = new JPanel();
+            panHori = new JPanel();
+        }
+        
         panVert.setLayout(null);
         panVert.setBackground(Color.blue);
         panVert.setBounds(myX, myY,10,10);
@@ -188,17 +200,17 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
                             p.setBorder(redBorder);
                             p.setForeground(Color.red);
                             isConnected = true;
+                            break;
                         }
                         else{
                             JPanel p = (JPanel) c[i];
                             p.setBorder(blackBorder);
                             p.setForeground(Color.black);
-                            select.remove(panVert);
-                            select.remove(panHori);
+                            this.removeConnections();
                         }
                     }
             }
-            
+            select.repaint();
         }
     }
     @Override

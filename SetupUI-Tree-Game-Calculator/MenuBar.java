@@ -32,13 +32,13 @@ import javax.swing.undo.UndoManager;
  * Write a description of class MenuBar here.
  *
  * @author Noah Winn
- * @version (a version number or a date)
+ * @version 5/23/2024
  */
 public class MenuBar implements ActionListener
 {
     private JMenuBar menuBar;
     private Frame fram;
-    private JPanel pan;
+    private GroupSelector pan;
     private JMenu fileMenu, editMenu, viewMenu, testMenu, nodeMenu, helpMenu;
     
     private UndoManager undoManager = new UndoManager();
@@ -49,7 +49,7 @@ public class MenuBar implements ActionListener
      */
     public MenuBar(){}
 
-    public void createMenuBar(Frame fram, JPanel pan){
+    public void createMenuBar(Frame fram, GroupSelector pan){
         this.fram = fram;
         this.pan = pan;
         
@@ -103,12 +103,7 @@ public class MenuBar implements ActionListener
         
         fram.setJMenuBar(menuBar);
     }
-    /**
-     * An example of a method - replace this comment with your own
-     *
-     * @param  y  a sample parameter for a method
-     * @return    the sum of x and y
-     */
+    
     /**
      * Constructor for objects of class Frame
      */
@@ -335,11 +330,20 @@ public class MenuBar implements ActionListener
             for(int i=0; i < c.length; i++){
                 if(c[i].getForeground() == Color.red){
                     //Change foreground and border back to black
+                    c[i].setForeground(Color.black);
                     Panel p = (Panel) c[i];
                     p.setBorder(blackBorder);
-                    p.setForeground(Color.black);
                     //Duplicate c[i]
-                    pan.add(cloneSwingComponent(c[i]));
+                    //Panel copy = (Panel) cloneSwingComponent(c[i]);
+                    Panel copy = new Panel();
+                    copy.setBounds(p.getBounds());
+                    //Shift
+                    int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
+                    int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
+                    copy.setLocation(shiftX, shiftY);
+                    copy.setPanel(pan);
+                    //System.out.println(copy);
+                    pan.add(copy);
                     
                 }
             }
@@ -384,6 +388,7 @@ public class MenuBar implements ActionListener
                         //c[i].list();
                         out.println(c[i]);
                         //Remove c[i]
+                        p.removeConnections();
                         pan.remove(c[i]);
                     }
                 }
@@ -412,7 +417,8 @@ public class MenuBar implements ActionListener
                     if(line.substring(0,i).equals("Panel")){
                         Panel p = new Panel();
                         line = line.substring(i+2, line.length()-1);
-                        System.out.println(line);
+                        //System.out.println(line);
+                        p.setPanel(pan);
                         String[] crd = line.split(",");
                         String[] siz = crd[2].split("x");
                         p.setBounds(
@@ -452,14 +458,19 @@ public class MenuBar implements ActionListener
         if(e.getActionCommand() == "Display Sample Tree"){}
         
         if(e.getActionCommand() == "Add Game Node"){
-            System.out.println("Creating Node");
-            pan.add(new Panel());
+            //System.out.println("Creating Node");
+            Panel p = new Panel();
+            p.setPanel(pan);
+            pan.add(p);
+            fram.repaint();
             fram.repaint();
         }
         if(e.getActionCommand() == "Remove Game Node"){
             Component[] c = pan.getComponents();
             for(int i=0; i < c.length; i++){
                 if(c[i].getForeground() == Color.red){
+                    Panel p = (Panel) c[i];
+                    p.removeConnections();
                     pan.remove(c[i]);
                 }
             }

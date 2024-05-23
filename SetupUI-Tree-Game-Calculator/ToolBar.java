@@ -3,7 +3,7 @@
  * Write a description of class ToolBar here.
  *
  * @author Noah Winn
- * @version (a version number or a date)
+ * @version 5/23/2024
  */
 import javax.swing.JToolBar;
 import javax.swing.JButton;
@@ -59,7 +59,7 @@ public class ToolBar implements ActionListener
     @Override
     public void actionPerformed(ActionEvent e){
         if(e.getActionCommand() == "Create Node"){
-            System.out.println("Creating Node");
+            //System.out.println("Creating Node");
             Panel p = new Panel();
             p.setPanel(pan);
             pan.add(p);
@@ -135,6 +135,7 @@ public class ToolBar implements ActionListener
                         //c[i].list();
                         out.println(c[i]);
                         //Remove c[i]
+                        p.removeConnections();
                         pan.remove(c[i]);
                     }
                 }
@@ -161,8 +162,9 @@ public class ToolBar implements ActionListener
                     // EXPECT EITHER "Panel" or "Connector"
                     if(line.substring(0,i).equals("Panel")){
                         Panel p = new Panel();
+                        p.setPanel(pan);
                         line = line.substring(i+2, line.length()-1);
-                        System.out.println(line);
+                        //System.out.println(line);
                         String[] crd = line.split(",");
                         String[] siz = crd[2].split("x");
                         p.setBounds(

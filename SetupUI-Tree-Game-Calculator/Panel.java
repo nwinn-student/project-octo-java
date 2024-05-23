@@ -19,10 +19,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JPopupMenu;
 
 /**
- * Displays a graphical representation of the formulas presented within <code>Formula</code>.
+ * Write a description of class Panel here.
  *
  * @author Noah Winn
- * @version 6/25/2023
+ * @version 5/22/2024
  */
 
 
@@ -35,17 +35,18 @@ public class Panel extends JPanel implements MouseListener,MouseMotionListener,M
     private int myY = 0;
     
     private double currentZoom = 1;
-    private double maxZoom = 5;
-    private double minZoom = .25;
-    private boolean isHighlighted = false;
+    private final double maxZoom = 5;
+    private final double minZoom = .25;
     private GroupSelector select;
-    private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
-    private Border redBorder = BorderFactory.createLineBorder(Color.RED,3);
+    private final Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
+    private final Border redBorder = BorderFactory.createLineBorder(Color.RED,3);
     
     private Connector top;
     private Connector left;
     private Connector bottom;
     private Connector right;
+    
+    private JPopupMenu menu;
     //private KeyboardFocusManager focusManager =
     //        KeyboardFocusManager.getCurrentKeyboardFocusManager();
     /**
@@ -76,6 +77,16 @@ public class Panel extends JPanel implements MouseListener,MouseMotionListener,M
     public void setPanel(GroupSelector select){
         this.select = select;
     }
+    public void removeConnections(){
+        if(top != null){
+            top.removeConnections();
+            select.remove(top);
+            bottom.removeConnections();
+            select.remove(bottom);
+            //select.remove(top);
+            //select.remove(top);
+        }
+    }
     /**
      * Zooms in and out in accordance with mouse scroll wheel
      */
@@ -100,9 +111,9 @@ public class Panel extends JPanel implements MouseListener,MouseMotionListener,M
         //this.setLocation(x, y);
         if(top != null){
             top.setPosition("Top", select, this);
-            left.setPosition("Left", select, this);
+            //left.setPosition("Left", select, this);
             bottom.setPosition("Bottom", select, this);
-            right.setPosition("Right", select, this);
+            //right.setPosition("Right", select, this);
         }
         select.repaint();
     }
@@ -131,9 +142,9 @@ public class Panel extends JPanel implements MouseListener,MouseMotionListener,M
         // Move other selected pieces, should this item be selected?
         if(top != null){
             top.setPosition("Top", select, this);
-            left.setPosition("Left", select, this);
+            //left.setPosition("Left", select, this);
             bottom.setPosition("Bottom", select, this);
-            right.setPosition("Right", select, this);
+            //right.setPosition("Right", select, this);
         }
         select.repaint();
     } 
@@ -144,24 +155,26 @@ public class Panel extends JPanel implements MouseListener,MouseMotionListener,M
         //select.remove(bottom);
         //select.remove(right);
         select.repaint();
+        
     }
     @Override
     public void mouseEntered(MouseEvent e){
         if(top == null){
             top = new Connector();
-            left = new Connector();
+            //left = new Connector();
             bottom = new Connector();
-            right = new Connector();
+            bottom.setPosition("Bottom", select, this);
+            //right = new Connector();
         }
         top.setPosition("Top", select, this);
-        left.setPosition("Left", select, this);
+        //left.setPosition("Left", select, this);
         bottom.setPosition("Bottom", select, this);
-        right.setPosition("Right", select, this);
+        //right.setPosition("Right", select, this);
         
         select.add(top);
-        select.add(left);
+        //select.add(left);
         select.add(bottom);
-        select.add(right);
+        //select.add(right);
         select.repaint();
     }
     @Override
@@ -171,7 +184,7 @@ public class Panel extends JPanel implements MouseListener,MouseMotionListener,M
         if (e.getButton() == MouseEvent.BUTTON1){
             //System.out.println("Left button clicked");
             // make sure it is left click
-            if(isHighlighted){
+            if(getBorder() == redBorder){
                 setBorder(blackBorder);
                 this.setForeground(Color.black);
             }
@@ -179,13 +192,26 @@ public class Panel extends JPanel implements MouseListener,MouseMotionListener,M
                 setBorder(redBorder);
                 this.setForeground(Color.red);
             }
-            isHighlighted=!isHighlighted;
+            if(menu != null){
+                menu.setVisible(false);
+            }
         } else if (e.getButton() == MouseEvent.BUTTON2){
-            System.out.println("Middle button clicked");
+            //System.out.println("Middle button clicked");
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             //System.out.println("Right button clicked");
             // pop up editmenu when rightclick
+            if(menu == null){
+                menu = new JPopupMenu("Node Editor");
+                menu.add("Edit View");
+            }
             
+            int deltaX = e.getXOnScreen() - screenX;
+            int deltaY = e.getYOnScreen() - screenY;
+                
+            menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
+        
+            
+            menu.setVisible(true);
         } 
         
         
@@ -206,7 +232,7 @@ public class Panel extends JPanel implements MouseListener,MouseMotionListener,M
     }
     private int getDistanceFromCenter(String type, int position){
         if(type.equals("X")){
-            System.out.println(getCenter(type)+" "+position);
+            //System.out.println(getCenter(type)+" "+position);
             return getCenter(type) - position/2;
         }
         else if(type.equals("Y")){
