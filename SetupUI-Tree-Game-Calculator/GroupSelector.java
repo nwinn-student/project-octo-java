@@ -18,7 +18,10 @@ import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 
 /**
- * Write a description of class GroupSelector here.
+ * The GroupSelector class has JPanel objects attached to it, responding to clicks 
+ * and drags to increase functionality.
+ * The main use of the GroupSelector class is to store and "select" a collection
+ * of JPanel type objects in order to manipulate or hold them.
  *
  * @author Noah Winn
  * @version 5/23/2024
@@ -100,17 +103,17 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
         Component[] c = this.getComponents();
         for(int i=0; i < c.length; i++){
             if(c[i] != rect){
-                if(c[i].getClass().equals(Panel.class)){
+                if(c[i].getClass().equals(Node.class)){
                     if(fallsInside(rect.getBounds(),c[i].getBounds())){
                         //Change foreground and border back to black
-                        JPanel p = (JPanel) c[i];
+                        Node p = (Node) c[i];
                         p.setBorder(redBorder);
-                        p.setForeground(Color.red);
+                        c[i].setForeground(Color.red);
                     }
                     else{
-                        JPanel p = (JPanel) c[i];
+                        Node p = (Node) c[i];
                         p.setBorder(blackBorder);
-                        p.setForeground(Color.black);
+                        c[i].setForeground(Color.black);
                     }
                 }
             }
@@ -141,10 +144,10 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
             Component[] c = this.getComponents();
             for(int i=0; i < c.length; i++){
                 //System.out.println(Panel.class);
-                if(c[i].getClass().equals(Panel.class)){
-                    Panel p = (Panel) c[i];
+                if(c[i].getClass().equals(Node.class)){
+                    Node p = (Node) c[i];
                     p.setBorder(blackBorder);
-                    p.setForeground(Color.black);
+                    c[i].setForeground(Color.black);
                 }
                 
             }

@@ -1,25 +1,19 @@
-import java.awt.event.*;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
-import java.awt.Dimension;
 import java.awt.Color;
-import java.awt.geom.AffineTransform;
 import java.awt.Rectangle;
-import java.awt.Graphics;
-import java.awt.Container;
 import java.awt.Component;
-import javax.swing.BoundedRangeModel;
-import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.JViewport;
-import java.awt.Point;
-import javax.swing.SwingUtilities;
-import java.awt.Graphics2D;
-import java.awt.KeyboardFocusManager;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
-import javax.swing.JPopupMenu;
+
+
 
 /**
- * Write a description of class Connector here.
+ * The Connector class has JPanel objects attached to it, responding to clicks 
+ * and drags to increase functionality.
  *
  * @author Noah Winn
  * @version 5/22/2024
@@ -66,7 +60,7 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         //this.setName("Connector");
         //this.setRequestFocusEnabled(true);
     }
-    public void setPosition(String pos, GroupSelector select, Panel pan){
+    public void setPosition(String pos, GroupSelector select, Node pan){
         this.pos = pos;
         this.select = select;
         int height = (int) pan.getSize().getHeight();
@@ -78,6 +72,23 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         int curWidth = (int) this.getSize().getWidth();
         if(pos.equals("Top")){
             this.setBounds((width-curWidth)/2 + positionX,positionY-height/10, height/10, width/10);
+            if(panHori != null){
+                int vertX = (int)panVert.getLocation().getX();
+                int vertY = (int)panVert.getLocation().getY();
+                int vertH = (int)panVert.getSize().getHeight();
+                int vertW = (int)panVert.getSize().getWidth();
+                int horiX = (int)panHori.getLocation().getX();
+                int horiY = (int)panHori.getLocation().getY();
+                int horiH = (int)panHori.getSize().getHeight();
+                int horiW = (int)panHori.getSize().getWidth();
+                System.out.println(vertH);
+                int h = (int)this.getSize().getHeight();
+                int w = (int)this.getSize().getWidth();
+                myX = getX();
+                myY = getY();
+                panVert.setBounds(myX, myY-vertH, w, vertH);
+                panHori.setBounds(horiX, horiY, horiW, h);
+            }
         }
         else if(pos.equals("Left")){
             //this.setBounds(positionX-width/10,(height-curHeight)/2 + positionY, height/10, width/10);
@@ -87,7 +98,25 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         }
         else if(pos.equals("Bottom")){
             this.setBounds((width-curWidth)/2 + positionX,height-curHeight + positionY+height/10, height/10, width/10);
+            if(panHori != null){
+                int vertX = (int)panVert.getLocation().getX();
+                int vertY = (int)panVert.getLocation().getY();
+                int vertH = (int)panVert.getSize().getHeight();
+                int vertW = (int)panVert.getSize().getWidth();
+                int horiX = (int)panHori.getLocation().getX();
+                int horiY = (int)panHori.getLocation().getY();
+                int horiH = (int)panHori.getSize().getHeight();
+                int horiW = (int)panHori.getSize().getWidth();
+                System.out.println(vertH);
+                int h = (int)this.getSize().getHeight();
+                int w = (int)this.getSize().getWidth();
+                myX = getX();
+                myY = getY();
+                panVert.setBounds(myX, myY, w, vertH);
+                panHori.setBounds(horiX, horiY, horiW, h);
+            }
         }
+        
         //this.setBounds(height, width, 5,5);
         select.repaint();
         //this.repaint();
@@ -115,27 +144,22 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         if(panVert == null){
             panVert = new JPanel();
             panHori = new JPanel();
+            panVert.setLayout(null);
+            panVert.setBackground(Color.blue);
+            //panVert.setBounds(myX, myY,10,10);
+            panVert.setVisible(true);
+            panHori.setLayout(null);
+            panHori.setBackground(Color.blue);
+            //panHori.setBounds(myX, myY,10,10);
+            panHori.setVisible(true);
+        
+            select.add(panVert);
+            select.add(panHori);
+            //select.repaint();
         }
         
-        panVert.setLayout(null);
-        panVert.setBackground(Color.blue);
-        panVert.setBounds(myX, myY,10,10);
-        panVert.setVisible(true);
-        panHori.setLayout(null);
-        panHori.setBackground(Color.blue);
-        panHori.setBounds(myX, myY,10,10);
-        panHori.setVisible(true);
         
-        select.add(panVert);
-        select.add(panHori);
-        select.repaint();
-        // SELECT THE NODE PRESSED -- STOPPED HERE
-        //selector = new JPanel();
-        //selector.setBackground(Color.blue);
-        //selector.setBounds(myX,myY,20,20);
-        //selector.setOpaque(true);
-        //this.add(selector);
-        //this.requestFocusInWindow();
+        
     }
     @Override
     public void mouseDragged(MouseEvent e){
@@ -187,13 +211,14 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
     }
     @Override
     public void mouseReleased(MouseEvent e){
+        isConnected = true; // fixed for testing
         if(!isConnected){
             // Look at distance, if too far away then remove
             // SNAP TO the nearest panel connector within x distance
             Component[] c = select.getComponents();
             for(int i=0; i < c.length; i++){
                     //not done!! work on later
-                    if(c[i].getClass().equals(Panel.class) || c[i].getClass().equals(Connector.class)){
+                    if(c[i].getClass().equals(Node.class) || c[i].getClass().equals(Connector.class)){
                         if(fallsInside(this.getBounds(),c[i].getBounds())){
                             //Change foreground and border back to black
                             JPanel p = (JPanel) c[i];
@@ -225,5 +250,7 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         }
         return false;
     }
-    
+    private void updateConnections(){
+        
+    }
 }

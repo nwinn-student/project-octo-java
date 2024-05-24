@@ -3,7 +3,7 @@
  * Write a description of class Main here.
  *
  * @author Noah Winn
- * @version (a version number or a date)
+ * @version 5/23/2024
  */
 public class Main
 {

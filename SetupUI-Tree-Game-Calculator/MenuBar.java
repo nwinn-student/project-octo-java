@@ -29,7 +29,9 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 /**
- * Write a description of class MenuBar here.
+ * The MenuBar class sets up a collection of buttons, such as
+ * copy, cut, create, delete, and paste, that can be used to directly impact
+ * the screen.
  *
  * @author Noah Winn
  * @version 5/23/2024
@@ -331,17 +333,18 @@ public class MenuBar implements ActionListener
                 if(c[i].getForeground() == Color.red){
                     //Change foreground and border back to black
                     c[i].setForeground(Color.black);
-                    Panel p = (Panel) c[i];
+                    Node p = (Node) c[i];
                     p.setBorder(blackBorder);
                     //Duplicate c[i]
                     //Panel copy = (Panel) cloneSwingComponent(c[i]);
-                    Panel copy = new Panel();
+                    Node copy = new Node();
                     copy.setBounds(p.getBounds());
                     //Shift
                     int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
                     int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
                     copy.setLocation(shiftX, shiftY);
                     copy.setPanel(pan);
+                    copy.updateZoom();
                     //System.out.println(copy);
                     pan.add(copy);
                     
@@ -358,7 +361,7 @@ public class MenuBar implements ActionListener
                     if(c[i].getForeground() == Color.red){
                         //Copy c[i], meaning we place it in clipboard.txt
                         //Change foreground and border back to black
-                        Panel p = (Panel) c[i];
+                        Node p = (Node) c[i];
                         p.setBorder(blackBorder);
                         p.setForeground(Color.black);
                         out.println(c[i]);
@@ -382,7 +385,7 @@ public class MenuBar implements ActionListener
                     if(c[i].getForeground() == Color.red){
                         //Copy c[i], meaning we place it in clipboard.txt
                         //Change foreground and border back to black
-                        Panel p = (Panel) c[i];
+                        Node p = (Node) c[i];
                         p.setBorder(blackBorder);
                         p.setForeground(Color.black);
                         //c[i].list();
@@ -413,18 +416,24 @@ public class MenuBar implements ActionListener
                             break;
                         }
                     }
-                    // EXPECT EITHER "Panel" or "Connector"
-                    if(line.substring(0,i).equals("Panel")){
-                        Panel p = new Panel();
+                    // EXPECT EITHER "Node" or "Connector"
+                    if(line.substring(0,i).equals("Node")){
+                        Node p = new Node();
+                        p.setPanel(pan);
                         line = line.substring(i+2, line.length()-1);
                         //System.out.println(line);
-                        p.setPanel(pan);
+                        
                         String[] crd = line.split(",");
                         String[] siz = crd[2].split("x");
                         p.setBounds(
                             Integer.parseInt(crd[0]),Integer.parseInt(crd[1]),
                             Integer.parseInt(siz[0]),Integer.parseInt(siz[1])
                             );
+                        //Shift
+                        int shiftX = p.getX() + (int)p.getSize().getWidth()/5;
+                        int shiftY = p.getY() + (int)p.getSize().getHeight()/5;
+                        p.setLocation(shiftX, shiftY);
+                        p.updateZoom();
                         pan.add(p);
                     }
                     else if(line.substring(0,i).equals("Connector")){
@@ -459,7 +468,7 @@ public class MenuBar implements ActionListener
         
         if(e.getActionCommand() == "Add Game Node"){
             //System.out.println("Creating Node");
-            Panel p = new Panel();
+            Node p = new Node();
             p.setPanel(pan);
             pan.add(p);
             fram.repaint();
@@ -469,7 +478,7 @@ public class MenuBar implements ActionListener
             Component[] c = pan.getComponents();
             for(int i=0; i < c.length; i++){
                 if(c[i].getForeground() == Color.red){
-                    Panel p = (Panel) c[i];
+                    Node p = (Node) c[i];
                     p.removeConnections();
                     pan.remove(c[i]);
                 }
