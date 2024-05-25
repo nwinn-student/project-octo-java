@@ -24,7 +24,7 @@ import javax.swing.BorderFactory;
  * of JPanel type objects in order to manipulate or hold them.
  *
  * @author Noah Winn
- * @version 5/23/2024
+ * @version 5/24/2024
  */
 
 
@@ -37,6 +37,7 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
     private int myY = 0;
     
     private Frame fram;
+    private EditPopupMenu menu;
     private boolean isHighlighted = false;
     private JPanel selector;
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
@@ -48,9 +49,10 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
     /**
      * Constructor for objects of class Panel
      */
-    public GroupSelector(Frame fram){
+    public GroupSelector(Frame fram, EditPopupMenu menu){
         this.fram = fram;
-        
+        this.menu = menu;
+        menu.createPopupMenu(this);
         //Source: https://stackoverflow.com/questions/874360
         addMouseListener(this);
         
@@ -102,6 +104,9 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
         //Highlight all within rectangle
         Component[] c = this.getComponents();
         for(int i=0; i < c.length; i++){
+            if(c.length > 4096){
+                break;
+            }
             if(c[i] != rect){
                 if(c[i].getClass().equals(Node.class)){
                     if(fallsInside(rect.getBounds(),c[i].getBounds())){
@@ -118,7 +123,7 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
                 }
             }
         }
-        
+        menu.setVisible(false);
         //System.out.println("Added JPanel");
         //System.out.println(rect);
         fram.repaint();
@@ -151,6 +156,11 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
                 }
                 
             }
+            menu.setVisible(false);
+        }
+        if(e.getButton() == MouseEvent.BUTTON3){
+            menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
+            menu.setVisible(true);
         }
         fram.repaint();
     }

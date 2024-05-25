@@ -22,11 +22,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
 import javax.swing.KeyStroke;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
 
 /**
  * The MenuBar class sets up a collection of buttons, such as
@@ -34,16 +29,16 @@ import javax.swing.undo.UndoManager;
  * the screen.
  *
  * @author Noah Winn
- * @version 5/23/2024
+ * @version 5/24/2024
  */
 public class MenuBar implements ActionListener
 {
     private JMenuBar menuBar;
     private Frame fram;
     private GroupSelector pan;
+    private EditPopupMenu menu;
     private JMenu fileMenu, editMenu, viewMenu, testMenu, nodeMenu, helpMenu;
     
-    private UndoManager undoManager = new UndoManager();
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
 
     /**
@@ -51,10 +46,10 @@ public class MenuBar implements ActionListener
      */
     public MenuBar(){}
 
-    public void createMenuBar(Frame fram, GroupSelector pan){
+    public void createMenuBar(Frame fram, GroupSelector pan, EditPopupMenu menu){
         this.fram = fram;
         this.pan = pan;
-        
+        this.menu = menu;
         menuBar = new JMenuBar();
         
         fileMenu = addMenu("File", menuBar, KeyEvent.VK_F); //ALT-F
@@ -179,7 +174,7 @@ public class MenuBar implements ActionListener
     
     @Override
     public void actionPerformed(ActionEvent e){
-        
+        menu.setVisible(false);
         if(e.getActionCommand() == "New"){
             //Open up a new frame
             
@@ -312,7 +307,7 @@ public class MenuBar implements ActionListener
             //USE: https://github.com/hneemann/Digital/tree/master/src/main/java/de/neemann/digital/undo
             //https://stackoverflow.com/questions/24433089/jtextarea-settext-undomanager
             try{
-                undoManager.undo();
+                //undoManager.undo();
             }
             catch(Exception a){
             
@@ -321,7 +316,7 @@ public class MenuBar implements ActionListener
         if(e.getActionCommand() == "Redo"){
             //https://stackoverflow.com/questions/24433089/jtextarea-settext-undomanager
             try{
-                undoManager.redo();
+                //undoManager.redo();
             }
             catch(Exception a){
             
@@ -343,7 +338,7 @@ public class MenuBar implements ActionListener
                     int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
                     int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
                     copy.setLocation(shiftX, shiftY);
-                    copy.setPanel(pan);
+                    copy.setPanel(pan, menu);
                     copy.updateZoom();
                     //System.out.println(copy);
                     pan.add(copy);
@@ -419,7 +414,7 @@ public class MenuBar implements ActionListener
                     // EXPECT EITHER "Node" or "Connector"
                     if(line.substring(0,i).equals("Node")){
                         Node p = new Node();
-                        p.setPanel(pan);
+                        p.setPanel(pan, menu);
                         line = line.substring(i+2, line.length()-1);
                         //System.out.println(line);
                         
@@ -469,7 +464,7 @@ public class MenuBar implements ActionListener
         if(e.getActionCommand() == "Add Game Node"){
             //System.out.println("Creating Node");
             Node p = new Node();
-            p.setPanel(pan);
+            p.setPanel(pan, menu);
             pan.add(p);
             fram.repaint();
             fram.repaint();

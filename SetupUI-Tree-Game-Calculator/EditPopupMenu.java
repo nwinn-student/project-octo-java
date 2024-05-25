@@ -1,107 +1,93 @@
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.KeyStroke;
+import java.awt.Event;
+import java.awt.event.KeyEvent;
+import java.awt.Component;
+import java.awt.Color;
+import java.io.PrintWriter;
+import javax.swing.border.Border;
+import javax.swing.BorderFactory;
+import java.util.Scanner;
+import java.io.File;
 
 /**
- * The ToolBar class sets up a collection of buttons, such as
- * copy, cut, create, delete, and paste, that can be used to directly impact
- * the screen.
+ * Write a description of class EditPopupMenu here.
  *
  * @author Noah Winn
  * @version 5/24/2024
  */
-import javax.swing.JToolBar;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.BorderLayout;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import java.awt.Component;
-import java.awt.Color;
-import java.io.PrintWriter;
-import java.util.Scanner;
-import java.io.File;
-import javax.swing.border.Border;
-import javax.swing.BorderFactory;
-
-public class ToolBar implements ActionListener
+public class EditPopupMenu extends JPopupMenu implements ActionListener
 {
-    private JToolBar toolBar;
-    private Frame fram;
+    private JPopupMenu menuBar;
     private GroupSelector pan;
-    private EditPopupMenu menu;
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
 
-    private JButton createNode;
     /**
-     * Constructor for objects of class ToolBar
+     * Constructor for objects of class EditPopupMenu
      */
-    public ToolBar(){}
+    public EditPopupMenu(){}
     
-    public void createToolBar(Frame fram, GroupSelector pan, EditPopupMenu menu){
-        this.fram = fram;
+    public void createPopupMenu(GroupSelector pan){
         this.pan = pan;
-        this.menu = menu;
-        toolBar = new JToolBar();
-        addButton("Create Node", toolBar);
-        addButton("Connect Nodes", toolBar);
-        addButton("Edit Node", toolBar);
-        addButton("Delete Node", toolBar);
-        addButton("Run", toolBar);
-        toolBar.addSeparator();
-        addButton("Copy", toolBar);
-        addButton("Cut",toolBar);
-        addButton("Paste", toolBar);
-        fram.add(toolBar, BorderLayout.PAGE_START);
+        
+        addMenuItem("Edit View", this, 0);
+        this.addSeparator();
+        addMenuItem("Duplicate", this, KeyEvent.VK_D);
+        addMenuItem("Copy", this, KeyEvent.VK_C); // CTRL C
+        addMenuItem("Cut", this, KeyEvent.VK_X); // CTRL X
+        addMenuItem("Paste", this, KeyEvent.VK_V); // CTRL V
+        this.addSeparator();
+        addMenuItem("Remove Nodes", this, KeyEvent.VK_DELETE);
+        this.setVisible(false);
     }
-    
-    public void addButton(String name, JToolBar parent){
-        JButton button = new JButton(name);
-        button.addActionListener(this);
-        button.setFocusable(false);
-        parent.add(button);
+    private void addMenuItem(String title, JPopupMenu parent, int key){
+        JMenuItem menuItem = new JMenuItem(title);
+        if(key != 0){
+            if(title.equals("Remove Nodes")){
+               menuItem.setAccelerator(KeyStroke.getKeyStroke(key, 0));
+            }
+            else{
+                 //Key is not undefined, will always require CTRL
+                menuItem.setAccelerator(KeyStroke.getKeyStroke(key, Event.CTRL_MASK));
+            }
+        }
+        menuItem.addActionListener(this);
+        parent.add(menuItem);
     }
-    
     @Override
     public void actionPerformed(ActionEvent e){
-        menu.setVisible(false);
-        if(e.getActionCommand() == "Create Node"){
-            //System.out.println("Creating Node");
-            Node p = new Node();
-            p.setPanel(pan, menu);
-            pan.add(p);
-            fram.repaint();
+        if(e.getActionCommand() == "Edit View"){
+            // Create a new frame or tabbedPane?
         }
-        else if(e.getActionCommand() == "Connect Nodes"){
-            //CONNECTS selected nodes
+        if(e.getActionCommand() == "Duplicate"){
             Component[] c = pan.getComponents();
             for(int i=0; i < c.length; i++){
                 if(c[i].getForeground() == Color.red){
-                    //Selected nodes have been obtained now connect them all, prob not this loop tho
+                    //Change foreground and border back to black
+                    c[i].setForeground(Color.black);
+                    Node p = (Node) c[i];
+                    p.setBorder(blackBorder);
+                    //Duplicate c[i]
+                    //Panel copy = (Panel) cloneSwingComponent(c[i]);
+                    Node copy = new Node();
+                    copy.setBounds(p.getBounds());
+                    //Shift
+                    int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
+                    int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
+                    copy.setLocation(shiftX, shiftY);
+                    copy.setPanel(pan, this);
+                    copy.updateZoom();
+                    //System.out.println(copy);
+                    pan.add(copy);
+                    
                 }
             }
-            fram.repaint();
+            pan.repaint();
         }
-        else if(e.getActionCommand() == "Edit Node"){
-            //EDITS selected nodes
-            Component[] c = pan.getComponents();
-            for(int i=0; i < c.length; i++){
-                if(c[i].getForeground() == Color.red){
-                    //Selected nodes have been obtained now open editor UI
-                    //for each one?
-                }
-            }
-            fram.repaint();
-        }
-        else if(e.getActionCommand() == "Delete Node"){
-            //DELETES selected nodes
-            Component[] c = pan.getComponents();
-            for(int i=0; i < c.length; i++){
-                if(c[i].getForeground() == Color.red){
-                    pan.remove(c[i]);
-                }
-            }
-            fram.repaint();
-        }
-        else if(e.getActionCommand() == "Copy"){
+        if(e.getActionCommand() == "Copy"){
             Component[] c = pan.getComponents();
             //Clear clipboard.txt
             try{
@@ -117,7 +103,7 @@ public class ToolBar implements ActionListener
                         
                     }
                 }
-                fram.repaint();
+                pan.repaint();
                 
                 out.close();
             }
@@ -125,7 +111,7 @@ public class ToolBar implements ActionListener
                 
             }
         }
-        else if(e.getActionCommand() == "Cut"){
+        if(e.getActionCommand() == "Cut"){
             Component[] c = pan.getComponents();
             //Clear clipboard.txt
             try{
@@ -144,7 +130,7 @@ public class ToolBar implements ActionListener
                         pan.remove(c[i]);
                     }
                 }
-                fram.repaint();
+                pan.repaint();
                 
                 out.close();
             }
@@ -152,7 +138,7 @@ public class ToolBar implements ActionListener
                 
             }
         }
-        else if(e.getActionCommand() == "Paste"){
+        if(e.getActionCommand() == "Paste"){
             try{
                 Scanner scan = new Scanner(new File("clipboard.txt"));
                 while(scan.hasNextLine()){
@@ -167,7 +153,7 @@ public class ToolBar implements ActionListener
                     // EXPECT EITHER "Panel" or "Connector"
                     if(line.substring(0,i).equals("Node")){
                         Node p = new Node();
-                        p.setPanel(pan, menu);
+                        p.setPanel(pan, this);
                         line = line.substring(i+2, line.length()-1);
                         //System.out.println(line);
                         
@@ -188,7 +174,7 @@ public class ToolBar implements ActionListener
                         
                     }
                 }
-                fram.repaint();
+                pan.repaint();
                 
                 scan.close();
             }
@@ -196,6 +182,15 @@ public class ToolBar implements ActionListener
                 
             }
         }
+        if(e.getActionCommand() == "Remove Nodes"){
+            //DELETES selected nodes
+            Component[] c = pan.getComponents();
+            for(int i=0; i < c.length; i++){
+                if(c[i].getForeground() == Color.red){
+                    pan.remove(c[i]);
+                }
+            }
+            pan.repaint();
+        }
     }
-    
 }

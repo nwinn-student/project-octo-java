@@ -7,23 +7,15 @@ import java.awt.Rectangle;
 import java.awt.Graphics;
 import java.awt.Container;
 import java.awt.Component;
-import javax.swing.BoundedRangeModel;
-import javax.swing.DefaultBoundedRangeModel;
-import javax.swing.JViewport;
-import java.awt.Point;
-import javax.swing.SwingUtilities;
-import java.awt.Graphics2D;
-import java.awt.KeyboardFocusManager;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
-import javax.swing.JPopupMenu;
 
 /**
  * The Node class has Connector objects attached to it, responding to clicks, 
  * hovers, scrolls, and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 5/22/2024
+ * @version 5/24/2024
  */
 
 
@@ -47,7 +39,7 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     private Connector bottom;
     private Connector right;
     
-    private JPopupMenu menu;
+    private EditPopupMenu menu;
     //private KeyboardFocusManager focusManager =
     //        KeyboardFocusManager.getCurrentKeyboardFocusManager();
     /**
@@ -75,8 +67,9 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         //this.setName("Panel");
         //this.setRequestFocusEnabled(true);
     }
-    public void setPanel(GroupSelector select){
+    public void setPanel(GroupSelector select, EditPopupMenu menu){
         this.select = select;
+        this.menu = menu;
     }
     public void removeConnections(){
         if(top != null){
@@ -137,19 +130,23 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     }
     @Override
     public void mouseDragged(MouseEvent e){
-        int deltaX = e.getXOnScreen() - screenX;
-        int deltaY = e.getYOnScreen() - screenY;
-                
-        setLocation(myX + deltaX, myY + deltaY);
-        
-        // Move other selected pieces, should this item be selected?
-        if(top != null){
-            top.setPosition("Top", select, this);
-            //left.setPosition("Left", select, this);
-            bottom.setPosition("Bottom", select, this);
-            //right.setPosition("Right", select, this);
+        if(e.getButton() == 0){
+            int deltaX = e.getXOnScreen() - screenX;
+            int deltaY = e.getYOnScreen() - screenY;
+                    
+            setLocation(myX + deltaX, myY + deltaY);
+            
+            // Move other selected pieces, should this item be selected?
+            if(top != null){
+                top.setPosition("Top", select, this);
+                //left.setPosition("Left", select, this);
+                bottom.setPosition("Bottom", select, this);
+                //right.setPosition("Right", select, this);
+            }
+            menu.setVisible(false);
+            select.repaint();
         }
-        select.repaint();
+        
     } 
     @Override
     public void mouseExited(MouseEvent e){
@@ -212,18 +209,10 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
             //System.out.println("Middle button clicked");
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             //System.out.println("Right button clicked");
-            // pop up editmenu when rightclick
-            if(menu == null){
-                menu = new JPopupMenu("Node Editor");
-                menu.add("Edit View");
-            }
-            
             int deltaX = e.getXOnScreen() - screenX;
             int deltaY = e.getYOnScreen() - screenY;
                 
             menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
-        
-            
             menu.setVisible(true);
         } 
         this.repaint();
