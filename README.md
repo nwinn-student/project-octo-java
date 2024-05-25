@@ -29,5 +29,5 @@ Currently prioritizing SetupUI-Tree-Game-Calculator as of 5/25/2024.
 ## Acknowledgements/Inspirations
 
 | Source | Inspired | Explanation |
-| :--- | :---- |
+| :--- | :--- | :--- |
 | [`Digital`](https://github.com/hneemann/Digital) | [`Setup-Tree UI`](https://github.com/nwinn-student/project-octo-java/tree/main/SetupUI-Tree-Game-Calculator) | Digital's UI design and approach to creating, editting, and deleting the various component elements inspired the approach that was taken within Setup-Tree UI. |
