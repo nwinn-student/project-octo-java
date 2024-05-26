@@ -8,7 +8,7 @@ import java.awt.Rectangle;
 import java.awt.Component;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
-
+import java.awt.Point;
 
 
 /**
@@ -16,7 +16,7 @@ import javax.swing.BorderFactory;
  * and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 5/24/2024
+ * @version 5/25/2024
  */
 
 
@@ -39,6 +39,7 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
     private Border redBorder = BorderFactory.createLineBorder(Color.RED,3);
     private JPanel panVert;
     private JPanel panHori;
+    private Point point;
     private boolean isConnected = false;
     
     //private KeyboardFocusManager focusManager =
@@ -73,21 +74,7 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         if(pos.equals("Top")){
             this.setBounds((width-curWidth)/2 + positionX,positionY-height/10, height/10, width/10);
             if(panHori != null){
-                int vertX = (int)panVert.getLocation().getX();
-                int vertY = (int)panVert.getLocation().getY();
-                int vertH = (int)panVert.getSize().getHeight();
-                int vertW = (int)panVert.getSize().getWidth();
-                int horiX = (int)panHori.getLocation().getX();
-                int horiY = (int)panHori.getLocation().getY();
-                int horiH = (int)panHori.getSize().getHeight();
-                int horiW = (int)panHori.getSize().getWidth();
-                System.out.println(vertH);
-                int h = (int)this.getSize().getHeight();
-                int w = (int)this.getSize().getWidth();
-                myX = getX();
-                myY = getY();
-                panVert.setBounds(myX, myY-vertH, w, vertH);
-                panHori.setBounds(horiX, horiY, horiW, h);
+                connectToPoint();
             }
         }
         else if(pos.equals("Left")){
@@ -99,21 +86,7 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         else if(pos.equals("Bottom")){
             this.setBounds((width-curWidth)/2 + positionX,height-curHeight + positionY+height/10, height/10, width/10);
             if(panHori != null){
-                int vertX = (int)panVert.getLocation().getX();
-                int vertY = (int)panVert.getLocation().getY();
-                int vertH = (int)panVert.getSize().getHeight();
-                int vertW = (int)panVert.getSize().getWidth();
-                int horiX = (int)panHori.getLocation().getX();
-                int horiY = (int)panHori.getLocation().getY();
-                int horiH = (int)panHori.getSize().getHeight();
-                int horiW = (int)panHori.getSize().getWidth();
-                System.out.println(vertH);
-                int h = (int)this.getSize().getHeight();
-                int w = (int)this.getSize().getWidth();
-                myX = getX();
-                myY = getY();
-                panVert.setBounds(myX, myY, w, vertH);
-                panHori.setBounds(horiX, horiY, horiW, h);
+                connectToPoint();
             }
         }
         
@@ -144,6 +117,7 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         if(panVert == null){
             panVert = new JPanel();
             panHori = new JPanel();
+            point = new Point(screenX, screenY);
             panVert.setLayout(null);
             panVert.setBackground(Color.blue);
             //panVert.setBounds(myX, myY,10,10);
@@ -196,6 +170,7 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
             panVert.setVisible(false);
             panHori.setVisible(false);
         }
+        point.setLocation(myX+deltaX, myY+deltaY);
         //isConnected = false;
         select.repaint();
         
@@ -250,7 +225,53 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         }
         return false;
     }
-    private void updateConnections(){
+    private void connectToPoint(){
+        if(pos.equals("Top")){
+            int vertH = (int)panVert.getSize().getHeight();
+            int horiY = (int)panHori.getLocation().getY();
+            //System.out.println(vertH);
+            int h = (int)this.getSize().getHeight();
+            int w = (int)this.getSize().getWidth();
+            myX = getX();
+            myY = getY();
+            int pointX = (int)point.getX()-myX; // + means left, - means right
+            int pointY = (int)point.getY()-myY; // + means up, - means down
+            
+            panVert.setBounds(myX, myY+pointY, w, -pointY);
+            if(pointX > 0 && -pointY > 0)
+                panHori.setBounds(myX, horiY, Math.abs(pointX), h); // myX for right
+            else if(pointX < 0 && -pointY > 0)
+                panHori.setBounds((int)point.getX(), horiY, Math.abs(pointX), h);
+            else{
+                panHori.setBounds(myX, horiY, 0,0);
+            }
+        }
+        else if(pos.equals("Bottom")){
+            int vertX = (int)panVert.getLocation().getX();
+            int vertY = (int)panVert.getLocation().getY();
+            int vertH = (int)panVert.getSize().getHeight();
+            int vertW = (int)panVert.getSize().getWidth();
+            int horiX = (int)panHori.getLocation().getX();
+            int horiY = (int)panHori.getLocation().getY();
+            int horiH = (int)panHori.getSize().getHeight();
+            int horiW = (int)panHori.getSize().getWidth();
+            //System.out.println(vertH);
+            int h = (int)this.getSize().getHeight();
+            int w = (int)this.getSize().getWidth();
+            myX = getX();
+            myY = getY();
+            int pointX = (int)point.getX()-myX; // + means left, - means right
+            int pointY = (int)point.getY()-myY; // + means up, - means down
+            
+            panVert.setBounds(myX, myY+h, w, pointY);
+            if(pointX > 0 && pointY > 0)
+                panHori.setBounds(myX, horiY, Math.abs(pointX), h);
+            else if(pointX < 0 && pointY > 0)
+                panHori.setBounds((int)point.getX(), horiY, Math.abs(pointX), h);
+            else
+                panHori.setBounds(myX, horiY, 0, 0);
+                
+        }
         
     }
 }
