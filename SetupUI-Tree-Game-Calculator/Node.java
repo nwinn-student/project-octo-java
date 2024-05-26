@@ -15,7 +15,7 @@ import javax.swing.BorderFactory;
  * hovers, scrolls, and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 5/24/2024
+ * @version 5/25/2024
  */
 
 

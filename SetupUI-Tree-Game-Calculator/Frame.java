@@ -4,11 +4,11 @@
  * which in turn have their own functionality.
  * 
  * The Frame class is planned to not be a fixed size, 750x750, but instead be
- * 100% height and 50% width of the screen, updating when the screen display size
+ * 50% height and 50% width of the screen, updating when the screen display size
  * changes, it will still be resizable.
  *
  * @author Noah Winn
- * @version 5/24/2024
+ * @version 5/25/2024
  */
 
 import java.awt.Color;

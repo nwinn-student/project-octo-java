@@ -2,7 +2,7 @@
 A holder of Java related projects that have yet to be completed and are in the works.
 
 
-Currently prioritizing SetupUI-Tree-Game-Calculator as of 5/25/2024.
+Currently prioritizing SetupUI-Tree-Game-Calculator as of 5/26/2024.
 
 ### Projects
 
@@ -13,7 +13,7 @@ Currently prioritizing SetupUI-Tree-Game-Calculator as of 5/25/2024.
 | Title | Description |
 | :--- | :---- |
 | [`Setup-Tree UI`](https://github.com/nwinn-student/project-octo-java/tree/main/SetupUI-Tree-Game-Calculator) | A UI that is planned to create multiple files that will later be read by a Tree-Game-Calculator project.  The project is meant to make Tree-Game-Calculator easier for developers to add to and adjust, without having to go into the files or learn the language used to create the files. |
-
+|[`Model-Generator`](https://github.com/nwinn-student/project-octo-java/tree/main/Model-Generator) | A program that can be used to create functions of various families for testing different approaches, such as LinReg, to find the model after changing it into a dataset.  The program is planned to be able to generate a csv file for each random model as well, with random ranges to simulate actual datasets.|
 </details>
 
 <details>
