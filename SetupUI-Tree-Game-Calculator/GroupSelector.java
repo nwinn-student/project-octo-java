@@ -16,7 +16,8 @@ import java.awt.Graphics2D;
 import java.awt.KeyboardFocusManager;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
-
+import java.util.List;
+import java.util.Arrays;
 /**
  * The GroupSelector class has JPanel objects attached to it, responding to clicks 
  * and drags to increase functionality.
@@ -63,8 +64,6 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
         this.setPreferredSize(new Dimension(500,500));
         
         this.setLocation(0,0);
-        System.out.println(getX());
-        System.out.println(getY());
         //this.setRequestFocusEnabled(true);
     }
     
@@ -102,27 +101,27 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
             rect.setBounds(myX-x,myY-y,x, y);
         }
         //Highlight all within rectangle
-        Component[] c = this.getComponents();
-        for(int i=0; i < c.length; i++){
-            if(c.length > 4096){
-                break;
-            }
-            if(c[i] != rect){
-                if(c[i].getClass().equals(Node.class)){
-                    if(fallsInside(rect.getBounds(),c[i].getBounds())){
-                        //Change foreground and border back to black
-                        Node p = (Node) c[i];
-                        p.setBorder(redBorder);
-                        c[i].setForeground(Color.red);
-                    }
-                    else{
-                        Node p = (Node) c[i];
-                        p.setBorder(blackBorder);
-                        c[i].setForeground(Color.black);
+        List<Component> frameElements = Arrays.asList(this.getComponents());
+        if(frameElements.size() < 4096){
+            for(Component elem : frameElements){
+                if(elem != rect){
+                    if(elem.getClass().equals(Node.class)){
+                        if(fallsInside(rect.getBounds(),elem.getBounds())){
+                            //Change foreground and border back to black
+                            Node p = (Node) elem;
+                            p.setBorder(redBorder);
+                            elem.setForeground(Color.red);
+                        }
+                        else{
+                            Node p = (Node) elem;
+                            p.setBorder(blackBorder);
+                            elem.setForeground(Color.black);
+                        }
                     }
                 }
             }
         }
+        
         menu.setVisible(false);
         //System.out.println("Added JPanel");
         //System.out.println(rect);
@@ -146,15 +145,15 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
         //else setBorder(redBorder);
         //isHighlighted=!isHighlighted;
         if (e.getButton() == MouseEvent.BUTTON1){
-            Component[] c = this.getComponents();
-            for(int i=0; i < c.length; i++){
-                //System.out.println(Panel.class);
-                if(c[i].getClass().equals(Node.class)){
-                    Node p = (Node) c[i];
-                    p.setBorder(blackBorder);
-                    c[i].setForeground(Color.black);
+            List<Component> frameElements = Arrays.asList(this.getComponents());
+            if(frameElements.size() < 4096){
+                for(Component elem : frameElements){
+                    if(elem.getClass().equals(Node.class)){
+                        Node p = (Node) elem;
+                        p.setBorder(blackBorder);
+                        elem.setForeground(Color.black);
+                    }
                 }
-                
             }
             menu.setVisible(false);
         }

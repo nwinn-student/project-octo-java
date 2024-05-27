@@ -22,7 +22,8 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
 import javax.swing.KeyStroke;
-
+import java.util.List;
+import java.util.Arrays;
 /**
  * The MenuBar class sets up a collection of buttons, such as
  * copy, cut, create, delete, and paste, that can be used to directly impact
@@ -292,14 +293,12 @@ public class MenuBar implements ActionListener
                     }
                     
                 }
-                
                 System.out.println(file);
             }
         }
         if(e.getActionCommand() == "Export"){}
         if(e.getActionCommand() == "Exit"){
             //Ask if they want to save
-            
             System.exit(0);
         }
         
@@ -309,94 +308,78 @@ public class MenuBar implements ActionListener
             try{
                 //undoManager.undo();
             }
-            catch(Exception a){
-            
-            }
+            catch(Exception a){}
         }
         if(e.getActionCommand() == "Redo"){
             //https://stackoverflow.com/questions/24433089/jtextarea-settext-undomanager
             try{
                 //undoManager.redo();
             }
-            catch(Exception a){
-            
-            }
+            catch(Exception a){}
         }
         if(e.getActionCommand() == "Duplicate"){
-            Component[] c = pan.getComponents();
-            for(int i=0; i < c.length; i++){
-                if(c[i].getForeground() == Color.red){
-                    //Change foreground and border back to black
-                    c[i].setForeground(Color.black);
-                    Node p = (Node) c[i];
-                    p.setBorder(blackBorder);
-                    //Duplicate c[i]
-                    //Panel copy = (Panel) cloneSwingComponent(c[i]);
-                    Node copy = new Node();
-                    copy.setBounds(p.getBounds());
-                    //Shift
-                    int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
-                    int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
-                    copy.setLocation(shiftX, shiftY);
-                    copy.setPanel(pan, menu);
-                    copy.updateZoom();
-                    //System.out.println(copy);
-                    pan.add(copy);
-                    
+            List<Component> frameElements = Arrays.asList(pan.getComponents());
+            if(frameElements.size() < 4096){
+                for(Component elem : frameElements){
+                    if(elem.getForeground() == Color.red){
+                        elem.setForeground(Color.black);
+                        Node p = (Node) elem;
+                        p.setBorder(blackBorder);
+                        Node copy = new Node();
+                        copy.setBounds(p.getBounds());
+                        int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
+                        int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
+                        copy.setLocation(shiftX, shiftY);
+                        copy.setPanel(pan, menu);
+                        copy.updateZoom();
+                        pan.add(copy);
+                    }
                 }
             }
             fram.repaint();
         }
         if(e.getActionCommand() == "Copy"){
-            Component[] c = pan.getComponents();
+            List<Component> frameElements = Arrays.asList(pan.getComponents());
             //Clear clipboard.txt
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
-                for(int i=0; i < c.length; i++){
-                    if(c[i].getForeground() == Color.red){
-                        //Copy c[i], meaning we place it in clipboard.txt
-                        //Change foreground and border back to black
-                        Node p = (Node) c[i];
-                        p.setBorder(blackBorder);
-                        p.setForeground(Color.black);
-                        out.println(c[i]);
-                        
+                // Don't want to take up too much memory
+                if(frameElements.size() < 4096){
+                    for(Component elem : frameElements){
+                        if(elem.getForeground() == Color.red){
+                            Node p = (Node) elem;
+                            p.setBorder(blackBorder);
+                            p.setForeground(Color.black);
+                            out.println(elem);
+                        }
                     }
                 }
                 fram.repaint();
-                
                 out.close();
             }
-            catch(Exception a){
-                
-            }
+            catch(Exception a){}
         }
         if(e.getActionCommand() == "Cut"){
-            Component[] c = pan.getComponents();
+            List<Component> frameElements = Arrays.asList(pan.getComponents());
             //Clear clipboard.txt
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
-                for(int i=0; i < c.length; i++){
-                    if(c[i].getForeground() == Color.red){
-                        //Copy c[i], meaning we place it in clipboard.txt
-                        //Change foreground and border back to black
-                        Node p = (Node) c[i];
-                        p.setBorder(blackBorder);
-                        p.setForeground(Color.black);
-                        //c[i].list();
-                        out.println(c[i]);
-                        //Remove c[i]
-                        p.removeConnections();
-                        pan.remove(c[i]);
+                if(frameElements.size() < 4096){
+                    for(Component elem : frameElements){
+                        if(elem.getForeground() == Color.red){
+                            Node p = (Node) elem;
+                            p.setBorder(blackBorder);
+                            p.setForeground(Color.black);
+                            out.println(elem);
+                            p.removeConnections();
+                            pan.remove(elem);
+                        }
                     }
                 }
                 fram.repaint();
-                
                 out.close();
             }
-            catch(Exception a){
-                
-            }
+            catch(Exception a){}
         }
         if(e.getActionCommand() == "Paste"){
             //Create c[i] and add it to pan
@@ -443,9 +426,7 @@ public class MenuBar implements ActionListener
                 
                 scan.close();
             }
-            catch(Exception a){
-                
-            }
+            catch(Exception a){}
         }
         if(e.getActionCommand() == "Find"){}
         if(e.getActionCommand() == "Settings"){}
@@ -470,20 +451,20 @@ public class MenuBar implements ActionListener
             fram.repaint();
         }
         if(e.getActionCommand() == "Remove Game Node"){
-            Component[] c = pan.getComponents();
-            for(int i=0; i < c.length; i++){
-                if(c[i].getForeground() == Color.red){
-                    Node p = (Node) c[i];
+            List<Component> frameElements = Arrays.asList(pan.getComponents());
+            for(Component elem : frameElements){
+                if(elem.getForeground() == Color.red){
+                    Node p = (Node) elem;
                     p.removeConnections();
-                    pan.remove(c[i]);
+                    pan.remove(elem);
                 }
             }
             fram.repaint();
         }
         if(e.getActionCommand() == "Remove All Node"){
-            Component[] c = pan.getComponents();
-            for(int i=0; i < c.length; i++){
-                pan.remove(c[i]);
+            List<Component> frameElements = Arrays.asList(pan.getComponents());
+            for(Component elem : frameElements){
+                pan.remove(elem);
             }
             fram.repaint();
         }

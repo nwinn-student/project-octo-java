@@ -12,6 +12,8 @@ import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import java.util.Scanner;
 import java.io.File;
+import java.util.List;
+import java.util.Arrays;
 
 /**
  * Write a description of class EditPopupMenu here.
@@ -63,80 +65,68 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
             // Create a new frame or tabbedPane?
         }
         if(e.getActionCommand() == "Duplicate"){
-            Component[] c = pan.getComponents();
-            for(int i=0; i < c.length; i++){
-                if(c[i].getForeground() == Color.red){
-                    //Change foreground and border back to black
-                    c[i].setForeground(Color.black);
-                    Node p = (Node) c[i];
-                    p.setBorder(blackBorder);
-                    //Duplicate c[i]
-                    //Panel copy = (Panel) cloneSwingComponent(c[i]);
-                    Node copy = new Node();
-                    copy.setBounds(p.getBounds());
-                    //Shift
-                    int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
-                    int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
-                    copy.setLocation(shiftX, shiftY);
-                    copy.setPanel(pan, this);
-                    copy.updateZoom();
-                    //System.out.println(copy);
-                    pan.add(copy);
-                    
+            List<Component> frameElements = Arrays.asList(pan.getComponents());
+            if(frameElements.size() < 4096){
+                for(Component elem : frameElements){
+                    if(elem.getForeground() == Color.red){
+                        elem.setForeground(Color.black);
+                        Node p = (Node) elem;
+                        p.setBorder(blackBorder);
+                        Node copy = new Node();
+                        copy.setBounds(p.getBounds());
+                        int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
+                        int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
+                        copy.setLocation(shiftX, shiftY);
+                        copy.setPanel(pan, this);
+                        copy.updateZoom();
+                        pan.add(copy);
+                    }
                 }
             }
             pan.repaint();
         }
         if(e.getActionCommand() == "Copy"){
-            Component[] c = pan.getComponents();
+            List<Component> frameElements = Arrays.asList(pan.getComponents());
             //Clear clipboard.txt
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
-                for(int i=0; i < c.length; i++){
-                    if(c[i].getForeground() == Color.red){
-                        //Copy c[i], meaning we place it in clipboard.txt
-                        //Change foreground and border back to black
-                        Node p = (Node) c[i];
-                        p.setBorder(blackBorder);
-                        p.setForeground(Color.black);
-                        out.println(c[i]);
-                        
+                // Don't want to take up too much memory
+                if(frameElements.size() < 4096){
+                    for(Component elem : frameElements){
+                        if(elem.getForeground() == Color.red){
+                            Node p = (Node) elem;
+                            p.setBorder(blackBorder);
+                            p.setForeground(Color.black);
+                            out.println(elem);
+                        }
                     }
                 }
                 pan.repaint();
-                
                 out.close();
             }
-            catch(Exception a){
-                
-            }
+            catch(Exception a){}
         }
         if(e.getActionCommand() == "Cut"){
-            Component[] c = pan.getComponents();
+            List<Component> frameElements = Arrays.asList(pan.getComponents());
             //Clear clipboard.txt
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
-                for(int i=0; i < c.length; i++){
-                    if(c[i].getForeground() == Color.red){
-                        //Copy c[i], meaning we place it in clipboard.txt
-                        //Change foreground and border back to black
-                        Node p = (Node) c[i];
-                        p.setBorder(blackBorder);
-                        p.setForeground(Color.black);
-                        //c[i].list();
-                        out.println(c[i]);
-                        //Remove c[i]
-                        p.removeConnections();
-                        pan.remove(c[i]);
+                if(frameElements.size() < 4096){
+                    for(Component elem : frameElements){
+                        if(elem.getForeground() == Color.red){
+                            Node p = (Node) elem;
+                            p.setBorder(blackBorder);
+                            p.setForeground(Color.black);
+                            out.println(elem);
+                            p.removeConnections();
+                            pan.remove(elem);
+                        }
                     }
                 }
                 pan.repaint();
-                
                 out.close();
             }
-            catch(Exception a){
-                
-            }
+            catch(Exception a){}
         }
         if(e.getActionCommand() == "Paste"){
             try{
@@ -184,10 +174,12 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
         }
         if(e.getActionCommand() == "Remove Nodes"){
             //DELETES selected nodes
-            Component[] c = pan.getComponents();
-            for(int i=0; i < c.length; i++){
-                if(c[i].getForeground() == Color.red){
-                    pan.remove(c[i]);
+            List<Component> frameElements = Arrays.asList(pan.getComponents());
+            for(Component elem : frameElements){
+                if(elem.getForeground() == Color.red){
+                    Node p = (Node) elem;
+                    p.removeConnections();
+                    pan.remove(elem);
                 }
             }
             pan.repaint();
