@@ -139,6 +139,15 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
             
             if(this.getForeground() == Color.red){
                 // Move other selected pieces, should this item be selected?
+                List<Component> frameElements = Arrays.asList(select.getComponents());
+                if(frameElements.size() < 4096){
+                    for(Component elem : frameElements){
+                        if(elem.getForeground() == Color.red && elem != this){
+                            Node p = (Node) elem;
+                            p.shiftLocation(deltaX, deltaY);
+                        }
+                    }
+                }
             } else {
                 List<Component> frameElements = Arrays.asList(select.getComponents());
                 if(frameElements.size() < 4096){
@@ -182,7 +191,22 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         }
     }
     @Override
-    public void mouseReleased(MouseEvent e){}
+    public void mouseReleased(MouseEvent e){
+        myX = getX();
+        myY = getY();
+        if(this.getForeground() == Color.red){
+                // Move other selected pieces, should this item be selected?
+                List<Component> frameElements = Arrays.asList(select.getComponents());
+                if(frameElements.size() < 4096){
+                    for(Component elem : frameElements){
+                        if(elem.getForeground() == Color.red && elem != this){
+                            Node p = (Node) elem;
+                            p.updateLocation();
+                        }
+                    }
+                }
+            }
+    }
     @Override
     public void mouseClicked(MouseEvent e){
         if (e.getButton() == MouseEvent.BUTTON1){
@@ -211,7 +235,22 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     }
     @Override
     public void mouseMoved(MouseEvent e){}
-    
+    public void shiftLocation(int deltaX, int deltaY){
+        
+        this.setLocation(this.myX + deltaX, this.myY + deltaY);
+        if(top != null){
+            top.updatePosition();
+            bottom.updatePosition();
+        }
+        if(connectedTo != null){
+            connectedTo.updateConnectionPosition();
+        }
+        menu.setVisible(false);
+    }
+    public void updateLocation(){
+        myX = getX();
+        myY = getY();
+    }
     private Dimension getZoomedSize(int x,int y) {
         this.setVisible(false);
         this.setVisible(true);

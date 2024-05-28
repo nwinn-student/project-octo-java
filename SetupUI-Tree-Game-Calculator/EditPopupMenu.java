@@ -14,19 +14,20 @@ import java.util.Scanner;
 import java.io.File;
 import java.util.List;
 import java.util.Arrays;
+import javax.swing.JInternalFrame;
 
 /**
  * Write a description of class EditPopupMenu here.
  *
  * @author Noah Winn
- * @version 5/25/2024
+ * @version 5/27/2024
  */
 public class EditPopupMenu extends JPopupMenu implements ActionListener
 {
     private JPopupMenu menuBar;
     private GroupSelector pan;
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
-
+    private EditView edit;
     /**
      * Constructor for objects of class EditPopupMenu
      */
@@ -62,7 +63,8 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
     @Override
     public void actionPerformed(ActionEvent e){
         if(e.getActionCommand() == "Edit View"){
-            // Create a new frame or tabbedPane?
+            edit = new EditView(pan);
+            this.setVisible(false);
         }
         if(e.getActionCommand() == "Duplicate"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());

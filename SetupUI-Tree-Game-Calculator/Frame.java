@@ -15,7 +15,8 @@ import java.awt.Color;
 import javax.swing.JFrame;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowEvent;
-
+import java.awt.Dimension;
+import java.awt.Toolkit;
 public class Frame extends JFrame implements WindowListener{
     // instance variables
     private EditPopupMenu popupMenu = new EditPopupMenu();
@@ -32,7 +33,11 @@ public class Frame extends JFrame implements WindowListener{
     public void initializeFrame(){
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setFocusable(false);
-        this.setBounds(0,0,750,750);
+        
+        int inset = 120;
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setSize(screenSize.width - inset*4,screenSize.height - inset*2);
+    
         this.setResizable(true);
         this.getContentPane().setBackground(new Color(200,255,255));
         this.addWindowListener(this);
