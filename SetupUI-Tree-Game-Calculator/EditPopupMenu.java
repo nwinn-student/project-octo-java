@@ -20,14 +20,15 @@ import javax.swing.JInternalFrame;
  * Write a description of class EditPopupMenu here.
  *
  * @author Noah Winn
- * @version 5/27/2024
+ * @version 5/29/2024
  */
 public class EditPopupMenu extends JPopupMenu implements ActionListener
 {
-    private JPopupMenu menuBar;
-    private GroupSelector pan;
+    private JPopupMenu menuBar = null;
+    private GroupSelector pan = null;
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
-    private EditView edit;
+    private EditView edit = null;
+    private Node edittedNode = null;
     /**
      * Constructor for objects of class EditPopupMenu
      */
@@ -60,11 +61,21 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
         menuItem.addActionListener(this);
         parent.add(menuItem);
     }
+    public void setChosen(Node edittedNode){
+        this.edittedNode = edittedNode;
+    }
     @Override
     public void actionPerformed(ActionEvent e){
         if(e.getActionCommand() == "Edit View"){
-            edit = new EditView(pan);
-            this.setVisible(false);
+            if(edittedNode == null){
+                return;
+            }
+            if(edit == null){
+                edit = new EditView(pan);
+                pan.add(edit);
+            }
+            edit.resetLocation();
+            edit.setVisible(true);
         }
         if(e.getActionCommand() == "Duplicate"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
@@ -186,5 +197,6 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
             }
             pan.repaint();
         }
+        this.setVisible(false);
     }
 }

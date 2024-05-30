@@ -8,19 +8,24 @@ import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import java.util.List;
 import java.util.Arrays;
-
+import java.time.Instant;
 /**
  * The Node class has Connector objects attached to it, responding to clicks, 
  * hovers, scrolls, and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 5/25/2024
+ * @version 5/29/2024
  */
 
 
 public class Node extends JPanel implements MouseListener,MouseMotionListener,MouseWheelListener
 {
     // instance variables
+    private final Instant uniqueID = Instant.now();
+    private String name = "Enter name here..";
+    private String description = "Enter description here..";
+    private List<String> formulas = null;
+    
     private int screenX = 0;
     private int screenY = 0;
     private int myX = 0;
@@ -64,12 +69,17 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         //this.setName("Panel");
         //this.setRequestFocusEnabled(true);
     }
-    public Connector getConnectedTo(){
-        return this.connectedTo;
-    }
-    public void setConnectedTo(Connector connectedTo){
-        this.connectedTo = connectedTo;
-    }
+    public Instant getUniqueID(){return uniqueID;}
+    public Connector getConnectedTo(){return connectedTo;}
+    public void setConnectedTo(Connector connectedTo){this.connectedTo = connectedTo;}
+    public String getName(){return name;}
+    public void setName(String name){this.name = name;}
+    public String getDescription(){return description;}
+    public void setDescription(String description){this.description = description;}
+    public List<String> getFormulas(){return formulas;}
+    public void appendFormulas(String form){formulas.add(form);}
+    public void setFormulas(List<String> formulas){this.formulas = formulas;}
+    
     public Connector getClosestConnector(Connector conn){
         if(top.getLocation().distance(conn.getLocation()) > 
             bottom.getLocation().distance(conn.getLocation())){
@@ -87,12 +97,10 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
             connectedTo.removeConnected();
         }
         if(top != null){
-            
             top.removeConnections();
             select.remove(top);
             bottom.removeConnections();
             select.remove(bottom);
-            
         }
     }
     /**
@@ -103,8 +111,7 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
             if(currentZoom > minZoom){
                 currentZoom -= .05;
             }
-        }
-        else{
+        } else {
             if(currentZoom < maxZoom){
                 currentZoom += .05;
             }
@@ -133,10 +140,7 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         if(e.getButton() == 0){
             int deltaX = e.getXOnScreen() - screenX;
             int deltaY = e.getYOnScreen() - screenY;
-                    
             setLocation(myX + deltaX, myY + deltaY);
-            
-            
             if(this.getForeground() == Color.red){
                 // Move other selected pieces, should this item be selected?
                 List<Component> frameElements = Arrays.asList(select.getComponents());
@@ -195,40 +199,51 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         myX = getX();
         myY = getY();
         if(this.getForeground() == Color.red){
-                // Move other selected pieces, should this item be selected?
-                List<Component> frameElements = Arrays.asList(select.getComponents());
-                if(frameElements.size() < 4096){
-                    for(Component elem : frameElements){
-                        if(elem.getForeground() == Color.red && elem != this){
-                            Node p = (Node) elem;
-                            p.updateLocation();
-                        }
+            // Move other selected pieces, should this item be selected?
+            List<Component> frameElements = Arrays.asList(select.getComponents());
+            if(frameElements.size() < 4096){
+                for(Component elem : frameElements){
+                    if(elem.getForeground() == Color.red && elem != this){
+                        Node p = (Node) elem;
+                        p.updateLocation();
                     }
                 }
             }
+        }
     }
     @Override
     public void mouseClicked(MouseEvent e){
         if (e.getButton() == MouseEvent.BUTTON1){
             if(getForeground().equals(Color.red)){
-                setBorder(blackBorder);
+                this.setBorder(blackBorder);
                 this.setForeground(Color.black);
             }
             else{
-                setBorder(redBorder);
+                this.setBorder(redBorder);
                 this.setForeground(Color.red);
             }
             if(menu != null){
+                menu.setChosen(null);
                 menu.setVisible(false);
             }
         } else if (e.getButton() == MouseEvent.BUTTON2){
             //System.out.println("Middle button clicked");
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             //System.out.println("Right button clicked");
-            int deltaX = e.getXOnScreen() - screenX;
-            int deltaY = e.getYOnScreen() - screenY;
-                
+            List<Component> frameElements = Arrays.asList(select.getComponents());
+            if(frameElements.size() < 4096){
+                for(Component elem : frameElements){
+                    if(elem.getClass().equals(Node.class)){
+                        Node p = (Node) elem;
+                        p.setBorder(blackBorder);
+                        elem.setForeground(Color.black);
+                    }
+                }
+            }
+            this.setBorder(redBorder);
+            this.setForeground(Color.red);
             menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
+            menu.setChosen(this);
             menu.setVisible(true);
         } 
         this.repaint();
