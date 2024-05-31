@@ -14,7 +14,7 @@ import java.time.Instant;
  * hovers, scrolls, and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 5/29/2024
+ * @version 5/31/2024
  */
 
 
@@ -23,7 +23,8 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     // instance variables
     private final Instant uniqueID = Instant.now();
     private String name = "Enter name here..";
-    private String description = "Enter description here..";
+    private String type = "Select type..";
+    private Node connNode = this; // Will only not be this when it has been changed
     private List<String> formulas = null;
     
     private int screenX = 0;
@@ -34,18 +35,20 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     private double currentZoom = 1;
     private final double maxZoom = 5;
     private final double minZoom = .25;
-    private GroupSelector select;
+    private GroupSelector select = null;
+    
     private final Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
     private final Border redBorder = BorderFactory.createLineBorder(Color.RED,3);
     
-    private Connector top;
-    private Connector left;
-    private Connector bottom;
-    private Connector right;
+    private Connector top = null;
+    private Connector left = null;
+    private Connector bottom = null;
+    private Connector right = null;
     
-    private Connector connectedTo;
+    private Connector connectedTo = null;
     
-    private EditPopupMenu menu;
+    private EditPopupMenu menu = null;
+    private ActionManager actions = null;
     /**
      * Constructor for objects of class Panel
      */
@@ -71,11 +74,16 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     }
     public Instant getUniqueID(){return uniqueID;}
     public Connector getConnectedTo(){return connectedTo;}
-    public void setConnectedTo(Connector connectedTo){this.connectedTo = connectedTo;}
+    public void setConnectedTo(Connector connectedTo){
+        this.connectedTo = connectedTo;
+        setConnectedNode(connectedTo.getParentNode());
+    }
+    public Node getConnectedNode(){return connNode;}
+    public void setConnectedNode(Node connNode){this.connNode = connNode;}
     public String getName(){return name;}
     public void setName(String name){this.name = name;}
-    public String getDescription(){return description;}
-    public void setDescription(String description){this.description = description;}
+    public String getType(){return type;}
+    public void setType(String type){this.type = type;}
     public List<String> getFormulas(){return formulas;}
     public void appendFormulas(String form){formulas.add(form);}
     public void setFormulas(List<String> formulas){this.formulas = formulas;}
@@ -90,6 +98,7 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     }
     public void setPanel(GroupSelector select, EditPopupMenu menu){
         this.select = select;
+        this.actions = select.getActions();
         this.menu = menu;
     }
     public void removeConnections(){
@@ -274,5 +283,9 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     }
     public void updateZoom(){
         currentZoom = this.getSize().getHeight()/50;
+    }
+    @Override
+    public String toString(){
+        return "Node["+uniqueID+","+name+","+type+","+connNode.getUniqueID()+","+formulas+",["+getX()+","+getY()+"],["+getWidth()+","+getHeight()+"]]";
     }
 }

@@ -20,7 +20,7 @@ import javax.swing.JInternalFrame;
  * Write a description of class EditPopupMenu here.
  *
  * @author Noah Winn
- * @version 5/29/2024
+ * @version 5/31/2024
  */
 public class EditPopupMenu extends JPopupMenu implements ActionListener
 {
@@ -74,6 +74,7 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
                 edit = new EditView(pan);
                 pan.add(edit);
             }
+            edit.editNode(edittedNode);
             edit.resetLocation();
             edit.setVisible(true);
         }

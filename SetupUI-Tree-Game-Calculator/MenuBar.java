@@ -30,15 +30,17 @@ import java.util.Arrays;
  * the screen.
  *
  * @author Noah Winn
- * @version 5/25/2024
+ * @version 5/31/2024
  */
 public class MenuBar implements ActionListener
 {
-    private JMenuBar menuBar;
-    private Frame fram;
-    private GroupSelector pan;
-    private EditPopupMenu menu;
-    private JMenu fileMenu, editMenu, viewMenu, testMenu, nodeMenu, helpMenu;
+    private JMenuBar menuBar = null;
+    private Frame fram = null;
+    private GroupSelector pan = null;
+    private EditPopupMenu menu = null;
+    private ActionManager actions = null;
+    
+    private JMenu fileMenu, editMenu, viewMenu, testMenu, nodeMenu, helpMenu = null;
     
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
 
@@ -49,6 +51,7 @@ public class MenuBar implements ActionListener
 
     public void createMenuBar(Frame fram, GroupSelector pan, EditPopupMenu menu){
         this.fram = fram;
+        this.actions = fram.getActions();
         this.pan = pan;
         this.menu = menu;
         menuBar = new JMenuBar();

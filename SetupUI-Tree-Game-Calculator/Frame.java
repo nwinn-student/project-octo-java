@@ -8,7 +8,7 @@
  * changes, it will still be resizable.
  *
  * @author Noah Winn
- * @version 5/25/2024
+ * @version 5/31/2024
  */
 
 import java.awt.Color;
@@ -20,6 +20,7 @@ import java.awt.Toolkit;
 public class Frame extends JFrame implements WindowListener{
     // instance variables
     private EditPopupMenu popupMenu = new EditPopupMenu();
+    private ActionManager actions = new ActionManager();
     /**
      * Constructor for objects of class Frame
      */
@@ -37,14 +38,11 @@ public class Frame extends JFrame implements WindowListener{
         int inset = 120;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         this.setSize(screenSize.width - inset*4,screenSize.height - inset*2);
-    
         this.setResizable(true);
         this.getContentPane().setBackground(new Color(200,255,255));
         this.addWindowListener(this);
         
         GroupSelector pan3 = new GroupSelector(this, popupMenu);
-        pan3.setLayout(null);
-        pan3.setFocusable(false);
         
         //Creates menu components
         MenuBar menu = new MenuBar();
@@ -57,6 +55,7 @@ public class Frame extends JFrame implements WindowListener{
         this.setVisible(true);
         this.setLocationRelativeTo(null);
     }
+    public ActionManager getActions(){return actions;}
     @Override
     public void windowDeactivated(WindowEvent w){
         popupMenu.setVisible(false);

@@ -25,7 +25,7 @@ import java.util.Arrays;
  * of JPanel type objects in order to manipulate or hold them.
  *
  * @author Noah Winn
- * @version 5/29/2024
+ * @version 5/31/2024
  */
 
 
@@ -37,14 +37,15 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
     private int myX = 0;
     private int myY = 0;
     
-    private Frame fram;
-    private EditPopupMenu menu;
+    private Frame fram = null;
+    private EditPopupMenu menu = null;
+    private ActionManager actions = null;
+    
     private boolean isHighlighted = false;
-    private JPanel selector;
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
     private Border redBorder = BorderFactory.createLineBorder(Color.RED,3);
     
-    private JPanel rect;
+    private JPanel rect = null;
     //private KeyboardFocusManager focusManager =
     //        KeyboardFocusManager.getCurrentKeyboardFocusManager();
     /**
@@ -52,6 +53,7 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
      */
     public GroupSelector(Frame fram, EditPopupMenu menu){
         this.fram = fram;
+        this.actions = fram.getActions();
         this.menu = menu;
         
         //Source: https://stackoverflow.com/questions/874360
@@ -70,7 +72,7 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
         menu.createPopupMenu(this);
         //this.setRequestFocusEnabled(true);
     }
-    
+    public ActionManager getActions(){return actions;}
     public void mousePressed(MouseEvent e){
         screenX = e.getXOnScreen();
         screenY = e.getYOnScreen();

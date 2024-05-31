@@ -5,7 +5,7 @@
  * the screen.
  *
  * @author Noah Winn
- * @version 5/25/2024
+ * @version 5/31/2024
  */
 import javax.swing.JToolBar;
 import javax.swing.JButton;
@@ -23,15 +23,17 @@ import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import java.util.List;
 import java.util.Arrays;
-public class ToolBar implements ActionListener
-{
-    private JToolBar toolBar;
-    private Frame fram;
-    private GroupSelector pan;
-    private EditPopupMenu menu;
+import java.util.ArrayList;
+public class ToolBar implements ActionListener{
+    private JToolBar toolBar = null;
+    private Frame fram = null;
+    private GroupSelector pan = null;
+    private EditPopupMenu menu = null;
+    private ActionManager actions = null;
+    
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
 
-    private JButton createNode;
+    private JButton createNode = null;
     /**
      * Constructor for objects of class ToolBar
      */
@@ -39,6 +41,7 @@ public class ToolBar implements ActionListener
     
     public void createToolBar(Frame fram, GroupSelector pan, EditPopupMenu menu){
         this.fram = fram;
+        this.actions = fram.getActions();
         this.pan = pan;
         this.menu = menu;
         toolBar = new JToolBar();
@@ -68,43 +71,54 @@ public class ToolBar implements ActionListener
             //System.out.println("Creating Node");
             Node p = new Node();
             p.setPanel(pan, menu);
+            actions.addUndoAbleAction("MKS"+p.toString());
             pan.add(p);
             fram.repaint();
         }
         else if(e.getActionCommand() == "Connect Nodes"){
             //CONNECTS selected nodes
             List<Component> frameElements = Arrays.asList(pan.getComponents());
+            List<Component> cElements = new ArrayList<>();
             if(frameElements.size() < 4096){
                 for(Component elem : frameElements){
                     if(elem.getForeground() == Color.red){
                         //Selected nodes have been obtained now connect them all, prob not this loop tho
+                        cElements.add(elem);
                     }
                 }
+                actions.addUndoAbleAction("CNM"+cElements.toString());
             }
+            
             fram.repaint();
         }
         else if(e.getActionCommand() == "Edit Node"){
             //EDITS selected nodes
             List<Component> frameElements = Arrays.asList(pan.getComponents());
+            List<Component> cElements = new ArrayList<>();
             if(frameElements.size() < 4096){
                 for(Component elem : frameElements){
                     if(elem.getForeground() == Color.red){
                         //Selected nodes have been obtained now open editor UI
                         //for each one?
+                        cElements.add(elem);
                     }
                 }
+                actions.addUndoAbleAction("EDM"+cElements.toString());
             }
             fram.repaint();
         }
         else if(e.getActionCommand() == "Delete Node"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
+            List<Component> cElements = new ArrayList<>();
             for(Component elem : frameElements){
                 if(elem.getForeground() == Color.red){
                     Node p = (Node) elem;
+                    cElements.add(p);
                     p.removeConnections();
                     pan.remove(elem);
                 }
             }
+            actions.addUndoAbleAction("DLM"+cElements.toString());
             fram.repaint();
         }
         else if(e.getActionCommand() == "Copy"){
@@ -126,8 +140,7 @@ public class ToolBar implements ActionListener
                 fram.repaint();
                 out.close();
             }
-            catch(Exception a){
-                }
+            catch(Exception a){}
         }
         else if(e.getActionCommand() == "Cut"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
