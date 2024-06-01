@@ -5,6 +5,8 @@ import javax.swing.JSeparator;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * Write a description of class EditView here.
@@ -12,7 +14,7 @@ import java.awt.event.ActionEvent;
  * @author Noah Winn
  * @version 5/31/2024
  */
-public class EditView extends JInternalFrame implements ActionListener{
+public class EditView extends JInternalFrame implements ActionListener, MouseListener{
     private GroupSelector pan = null;
     private JTextField header = null;
     private JTextField type = null;
@@ -30,26 +32,29 @@ public class EditView extends JInternalFrame implements ActionListener{
         this.pan = pan;
         this.setLayout(null);
         this.setLocation((int)pan.getSize().getWidth()-(int)pan.getSize().getWidth()/4, 0);
-        try {
-            this.setSelected(true);
-        } catch (java.beans.PropertyVetoException a) {}
-        
+        this.addMouseListener(this);
         JLabel headerLabel = new JLabel("Name:");
         headerLabel.setBounds(0,0,this.getWidth()/3,this.getHeight()/15);
         header = new JTextField("Enter name here..");
+        header.setToolTipText("Name");
         header.setBounds(this.getWidth()/3,0,2*this.getWidth()/3,this.getHeight()/15);
+        header.setFocusable(false);
         JSeparator sep = new JSeparator();
         sep.setBounds(0,this.getHeight()/15, this.getWidth(), this.getHeight());
         JLabel typeLabel = new JLabel("Type:");
         typeLabel.setBounds(0,this.getHeight()/15,this.getWidth()/3,this.getHeight()/15);
-        type = new JTextField("Enter description here..");
+        type = new JTextField("Enter type here..");
         type.setBounds(this.getWidth()/3,this.getHeight()/15,2*this.getWidth()/3,this.getHeight()/15);
+        type.setFocusable(false);
+        type.setToolTipText("Type");
         JSeparator sep2 = new JSeparator();
         sep2.setBounds(0,2*this.getHeight()/15, this.getWidth(), this.getHeight());
         JLabel connectedLabel = new JLabel("Parent:");
         connectedLabel.setBounds(0,2*this.getHeight()/15, this.getWidth(), this.getHeight()/15);
         connectedTo = new JTextField("Enter node name here..");
         connectedTo.setBounds(this.getWidth()/3,2*this.getHeight()/15, 2*this.getWidth()/3, this.getHeight()/15);
+        connectedTo.setEditable(false);
+        connectedTo.setFocusable(false);
         formulaAdder = new JButton("Add Formula");
         formulaAdder.setBounds(this.getWidth()/4, this.getHeight()/5, this.getWidth()/2, this.getHeight()/15);
         formulaAdder.addActionListener(this);
@@ -82,7 +87,6 @@ public class EditView extends JInternalFrame implements ActionListener{
         } else {
             connectedTo.setText(node.getConnectedNode().getName());
         }
-        
     }
     @Override
     public void actionPerformed(ActionEvent e){
@@ -95,5 +99,38 @@ public class EditView extends JInternalFrame implements ActionListener{
             
             //System.out.println(node);
         }
+    }
+    @Override
+    public void mouseEntered(MouseEvent e){
+        //System.out.println("Hehehehe");
+        header.setFocusable(true);
+        type.setFocusable(true);
+        connectedTo.setFocusable(true);
+    }
+    @Override
+    public void mouseExited(MouseEvent e){
+        //System.out.println("Oh no");
+        if(!isWithin(e)){
+            header.setFocusable(false);
+            type.setFocusable(false);
+            connectedTo.setFocusable(false);
+        }
+        
+    }
+    @Override
+    public void mouseClicked(MouseEvent e){}
+    @Override
+    public void mousePressed(MouseEvent e){}
+    @Override
+    public void mouseReleased(MouseEvent e){}
+    public boolean isWithin(MouseEvent e){
+        // work on later
+        if(e.getX() < 0 || e.getX() >= this.getWidth()){
+            return false;
+        }
+        if(e.getY() < 0 || e.getY() >= this.getHeight()){
+            return false;
+        }
+        return true;
     }
 }

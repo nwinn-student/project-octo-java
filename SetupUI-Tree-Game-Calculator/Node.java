@@ -21,10 +21,11 @@ import java.time.Instant;
 public class Node extends JPanel implements MouseListener,MouseMotionListener,MouseWheelListener
 {
     // instance variables
-    private final Instant uniqueID = Instant.now();
+    private Instant uniqueID = Instant.now();
     private String name = "Enter name here..";
     private String type = "Select type..";
     private Node connNode = this; // Will only not be this when it has been changed
+    private Instant connNodeID = connNode.getUniqueID();
     private List<String> formulas = null;
     
     private int screenX = 0;
@@ -73,13 +74,23 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         //this.setRequestFocusEnabled(true);
     }
     public Instant getUniqueID(){return uniqueID;}
+    public void setUniqueID(Instant uniqueID){this.uniqueID = uniqueID;}
     public Connector getConnectedTo(){return connectedTo;}
     public void setConnectedTo(Connector connectedTo){
         this.connectedTo = connectedTo;
-        setConnectedNode(connectedTo.getParentNode());
+        if(connectedTo != null){
+            setConnectedNode(connectedTo.getParentNode());
+        } else{
+            setConnectedNode(this);
+        }
     }
     public Node getConnectedNode(){return connNode;}
-    public void setConnectedNode(Node connNode){this.connNode = connNode;}
+    public void setConnectedNode(Node connNode){
+        this.connNode = connNode;
+        // Update stuff?
+    }
+    public Instant getConnectedNodeID(){return connNodeID;}
+    public void setConnectedNodeID(Instant connNodeID){this.connNodeID = connNodeID;}
     public String getName(){return name;}
     public void setName(String name){this.name = name;}
     public String getType(){return type;}
@@ -286,6 +297,6 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     }
     @Override
     public String toString(){
-        return "Node["+uniqueID+","+name+","+type+","+connNode.getUniqueID()+","+formulas+",["+getX()+","+getY()+"],["+getWidth()+","+getHeight()+"]]";
+        return "Node["+uniqueID+","+name+","+type+","+connNodeID+","+getX()+","+getY()+","+getWidth()+","+getHeight()+","+formulas+"]";
     }
 }

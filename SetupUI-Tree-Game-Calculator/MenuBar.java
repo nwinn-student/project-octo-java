@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -24,6 +25,7 @@ import java.io.PrintWriter;
 import javax.swing.KeyStroke;
 import java.util.List;
 import java.util.Arrays;
+import java.time.Instant;
 /**
  * The MenuBar class sets up a collection of buttons, such as
  * copy, cut, create, delete, and paste, that can be used to directly impact
@@ -143,37 +145,6 @@ public class MenuBar implements ActionListener
             return "";
         }
         return name.substring(lastIndexOf);
-    }
-    
-    //From https://stackoverflow.com/questions/50101290
-    private Component cloneSwingComponent(Component c) {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(c);
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            //System.out.println(ois.readObject());
-            return (Component) ois.readObject();
-        } catch (IOException|ClassNotFoundException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-    }
-    
-    private Object stringifySwingComponent(Component c){
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(c);
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            //System.out.println(ois.readObject());
-            return ois.readObject();
-        } catch (IOException|ClassNotFoundException ex) {
-            ex.printStackTrace();
-            return null;
-        }
     }
     
     @Override
@@ -388,6 +359,7 @@ public class MenuBar implements ActionListener
             //Create c[i] and add it to pan
             try{
                 Scanner scan = new Scanner(new File("clipboard.txt"));
+                List<Node> connCheck = new ArrayList<>();
                 while(scan.hasNextLine()){
                     String line = scan.nextLine();
                     char[] field = line.toCharArray();
@@ -397,19 +369,44 @@ public class MenuBar implements ActionListener
                             break;
                         }
                     }
-                    // EXPECT EITHER "Node" or "Connector"
+                    // EXPECT EITHER "Panel" or "Connector"
                     if(line.substring(0,i).equals("Node")){
+                        
                         Node p = new Node();
                         p.setPanel(pan, menu);
-                        line = line.substring(i+2, line.length()-1);
+                        line = line.substring(i+1, line.length()-1);
                         //System.out.println(line);
                         
                         String[] crd = line.split(",");
-                        String[] siz = crd[2].split("x");
+                        p.setUniqueID(Instant.parse(crd[0]));
+                        p.setName(crd[1]);
+                        // Look through current elements to see if any have the same ID
+                        List<Component> frameElements = Arrays.asList(pan.getComponents());
+                        if(!Instant.parse(crd[0]).equals(Instant.parse(crd[3])) 
+                            && frameElements.size() < 4096) {
+                            boolean none = true;
+                            for(Component elem : frameElements){
+                                if(elem.getClass().equals(Node.class)){
+                                    if(((Node)elem).getUniqueID().equals(Instant.parse(crd[3]))){
+                                        none = false;
+                                        p.setConnectedNode((Node)elem);
+                                    }
+                                }
+                            }
+                            
+                            if(none){
+                                p.setConnectedNodeID(Instant.parse(crd[3]));
+                                connCheck.add(p);
+                            }
+                        }
+                        
                         p.setBounds(
-                            Integer.parseInt(crd[0]),Integer.parseInt(crd[1]),
-                            Integer.parseInt(siz[0]),Integer.parseInt(siz[1])
+                            Integer.parseInt(crd[4]),Integer.parseInt(crd[5]),
+                            Integer.parseInt(crd[6]),Integer.parseInt(crd[7])
                             );
+                        //Formulas...
+                        
+                        
                         //Shift
                         int shiftX = p.getX() + (int)p.getSize().getWidth()/5;
                         int shiftY = p.getY() + (int)p.getSize().getHeight()/5;
@@ -420,14 +417,20 @@ public class MenuBar implements ActionListener
                     else if(line.substring(0,i).equals("Connector")){
                         
                     }
-                    //Create a panel
-                    //pan.add();
-                    //c.setBorder(blackBorder);
-                    //pan.add(c);
+                }
+                scan.close();
+                for(Node nod : connCheck){
+                    List<Component> frameElements = Arrays.asList(pan.getComponents());
+                    for(Component elem : frameElements){
+                        if(elem.getClass().equals(Node.class)){
+                            Node z = (Node)elem;
+                            if(z.getUniqueID().equals(nod.getConnectedNodeID())){
+                                nod.setConnectedNode(z);
+                            }
+                        }
+                    }
                 }
                 fram.repaint();
-                
-                scan.close();
             }
             catch(Exception a){}
         }

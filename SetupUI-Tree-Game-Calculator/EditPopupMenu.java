@@ -15,6 +15,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Arrays;
 import javax.swing.JInternalFrame;
+import java.time.Instant;
+import java.util.ArrayList;
 
 /**
  * Write a description of class EditPopupMenu here.
@@ -145,6 +147,7 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
         if(e.getActionCommand() == "Paste"){
             try{
                 Scanner scan = new Scanner(new File("clipboard.txt"));
+                List<Node> connCheck = new ArrayList<>();
                 while(scan.hasNextLine()){
                     String line = scan.nextLine();
                     char[] field = line.toCharArray();
@@ -156,17 +159,42 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
                     }
                     // EXPECT EITHER "Panel" or "Connector"
                     if(line.substring(0,i).equals("Node")){
+                        
                         Node p = new Node();
                         p.setPanel(pan, this);
-                        line = line.substring(i+2, line.length()-1);
+                        line = line.substring(i+1, line.length()-1);
                         //System.out.println(line);
                         
                         String[] crd = line.split(",");
-                        String[] siz = crd[2].split("x");
+                        p.setUniqueID(Instant.parse(crd[0]));
+                        p.setName(crd[1]);
+                        // Look through current elements to see if any have the same ID
+                        List<Component> frameElements = Arrays.asList(pan.getComponents());
+                        if(!Instant.parse(crd[0]).equals(Instant.parse(crd[3])) 
+                            && frameElements.size() < 4096) {
+                            boolean none = true;
+                            for(Component elem : frameElements){
+                                if(elem.getClass().equals(Node.class)){
+                                    if(((Node)elem).getUniqueID().equals(Instant.parse(crd[3]))){
+                                        none = false;
+                                        p.setConnectedNode((Node)elem);
+                                    }
+                                }
+                            }
+                            
+                            if(none){
+                                p.setConnectedNodeID(Instant.parse(crd[3]));
+                                connCheck.add(p);
+                            }
+                        }
+                        
                         p.setBounds(
-                            Integer.parseInt(crd[0]),Integer.parseInt(crd[1]),
-                            Integer.parseInt(siz[0]),Integer.parseInt(siz[1])
+                            Integer.parseInt(crd[4]),Integer.parseInt(crd[5]),
+                            Integer.parseInt(crd[6]),Integer.parseInt(crd[7])
                             );
+                        //Formulas...
+                        
+                        
                         //Shift
                         int shiftX = p.getX() + (int)p.getSize().getWidth()/5;
                         int shiftY = p.getY() + (int)p.getSize().getHeight()/5;
@@ -178,9 +206,20 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
                         
                     }
                 }
+                scan.close();
+                for(Node nod : connCheck){
+                    List<Component> frameElements = Arrays.asList(pan.getComponents());
+                    for(Component elem : frameElements){
+                        if(elem.getClass().equals(Node.class)){
+                            Node z = (Node)elem;
+                            if(z.getUniqueID().equals(nod.getConnectedNodeID())){
+                                nod.setConnectedNode(z);
+                            }
+                        }
+                    }
+                }
                 pan.repaint();
                 
-                scan.close();
             }
             catch(Exception a){
                 
@@ -201,3 +240,4 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
         this.setVisible(false);
     }
 }
+
