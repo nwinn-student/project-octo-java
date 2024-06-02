@@ -5,7 +5,7 @@
  * the screen.
  *
  * @author Noah Winn
- * @version 5/31/2024
+ * @version 6/2/2024
  */
 import javax.swing.JToolBar;
 import javax.swing.JButton;
@@ -31,7 +31,7 @@ public class ToolBar implements ActionListener{
     private GroupSelector pan = null;
     private EditPopupMenu menu = null;
     private ActionManager actions = null;
-    
+    private Integer nodeIndex = 0;
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
 
     private JButton createNode = null;
@@ -72,6 +72,8 @@ public class ToolBar implements ActionListener{
             //System.out.println("Creating Node");
             Node p = new Node();
             p.setPanel(pan, menu);
+            p.setName(nodeIndex.toString());
+            nodeIndex++;
             actions.addUndoAbleAction("MKS"+p.toString());
             pan.add(p);
             fram.repaint();
@@ -104,6 +106,7 @@ public class ToolBar implements ActionListener{
                         cElements.add(elem);
                     }
                 }
+                // to state before edit
                 actions.addUndoAbleAction("EDM"+cElements.toString());
             }
             fram.repaint();
@@ -198,7 +201,7 @@ public class ToolBar implements ActionListener{
                                 if(elem.getClass().equals(Node.class)){
                                     if(((Node)elem).getUniqueID().equals(Instant.parse(crd[3]))){
                                         none = false;
-                                        p.setConnectedNode((Node)elem);
+                                        p.setParentNode((Node)elem);
                                     }
                                 }
                             }
@@ -234,16 +237,14 @@ public class ToolBar implements ActionListener{
                         if(elem.getClass().equals(Node.class)){
                             Node z = (Node)elem;
                             if(z.getUniqueID().equals(nod.getConnectedNodeID())){
-                                nod.setConnectedNode(z);
+                                nod.setParentNode(z);
                             }
                         }
                     }
                 }
                 fram.repaint();
             }
-            catch(Exception a){
-                
-            }
+            catch(Exception a){}
         }
     }
     

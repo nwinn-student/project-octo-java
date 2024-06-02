@@ -12,7 +12,7 @@ import java.awt.event.MouseListener;
  * Write a description of class EditView here.
  *
  * @author Noah Winn
- * @version 5/31/2024
+ * @version 6/2/2024
  */
 public class EditView extends JInternalFrame implements ActionListener, MouseListener{
     private GroupSelector pan = null;
@@ -82,10 +82,10 @@ public class EditView extends JInternalFrame implements ActionListener, MouseLis
         this.node = node;
         header.setText(node.getName());
         type.setText(node.getType());
-        if(node.getUniqueID() == node.getConnectedNode().getUniqueID()) {
+        if(node.getUniqueID() == node.getParentNode().getUniqueID()) {
             connectedTo.setText("this");
         } else {
-            connectedTo.setText(node.getConnectedNode().getName());
+            connectedTo.setText(node.getParentNode().getName());
         }
     }
     @Override
@@ -102,20 +102,17 @@ public class EditView extends JInternalFrame implements ActionListener, MouseLis
     }
     @Override
     public void mouseEntered(MouseEvent e){
-        //System.out.println("Hehehehe");
         header.setFocusable(true);
         type.setFocusable(true);
         connectedTo.setFocusable(true);
     }
     @Override
     public void mouseExited(MouseEvent e){
-        //System.out.println("Oh no");
         if(!isWithin(e)){
             header.setFocusable(false);
             type.setFocusable(false);
             connectedTo.setFocusable(false);
         }
-        
     }
     @Override
     public void mouseClicked(MouseEvent e){}

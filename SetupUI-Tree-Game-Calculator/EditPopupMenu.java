@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * Write a description of class EditPopupMenu here.
  *
  * @author Noah Winn
- * @version 5/31/2024
+ * @version 6/2/2024
  */
 public class EditPopupMenu extends JPopupMenu implements ActionListener
 {
@@ -177,7 +177,7 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
                                 if(elem.getClass().equals(Node.class)){
                                     if(((Node)elem).getUniqueID().equals(Instant.parse(crd[3]))){
                                         none = false;
-                                        p.setConnectedNode((Node)elem);
+                                        p.setParentNode((Node)elem);
                                     }
                                 }
                             }
@@ -213,7 +213,7 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
                         if(elem.getClass().equals(Node.class)){
                             Node z = (Node)elem;
                             if(z.getUniqueID().equals(nod.getConnectedNodeID())){
-                                nod.setConnectedNode(z);
+                                nod.setParentNode(z);
                             }
                         }
                     }
@@ -240,4 +240,3 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
         this.setVisible(false);
     }
 }
-

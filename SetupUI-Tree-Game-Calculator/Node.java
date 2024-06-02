@@ -9,12 +9,14 @@ import javax.swing.BorderFactory;
 import java.util.List;
 import java.util.Arrays;
 import java.time.Instant;
+import java.util.ArrayList;
+
 /**
  * The Node class has Connector objects attached to it, responding to clicks, 
  * hovers, scrolls, and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 5/31/2024
+ * @version 6/2/2024
  */
 
 
@@ -24,8 +26,8 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     private Instant uniqueID = Instant.now();
     private String name = "Enter name here..";
     private String type = "Select type..";
-    private Node connNode = this; // Will only not be this when it has been changed
-    private Instant connNodeID = connNode.getUniqueID();
+    private Node parentNode = this; // Will only not be this when it has been changed
+    private Instant connNodeID = parentNode.getUniqueID();
     private List<String> formulas = null;
     
     private int screenX = 0;
@@ -42,11 +44,9 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     private final Border redBorder = BorderFactory.createLineBorder(Color.RED,3);
     
     private Connector top = null;
-    private Connector left = null;
     private Connector bottom = null;
-    private Connector right = null;
     
-    private Connector connectedTo = null;
+    private List<Node> childrenNodes = null;
     
     private EditPopupMenu menu = null;
     private ActionManager actions = null;
@@ -70,35 +70,67 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         this.setVisible(true);
         this.setEnabled(true);
         this.setFocusable(true);
-        //this.setName("Panel");
-        //this.setRequestFocusEnabled(true);
+        this.setToolTipText(this.getName());
+        
+        
     }
     public Instant getUniqueID(){return uniqueID;}
     public void setUniqueID(Instant uniqueID){this.uniqueID = uniqueID;}
-    public Connector getConnectedTo(){return connectedTo;}
-    public void setConnectedTo(Connector connectedTo){
-        this.connectedTo = connectedTo;
-        if(connectedTo != null){
-            setConnectedNode(connectedTo.getParentNode());
-        } else{
-            setConnectedNode(this);
-        }
-    }
-    public Node getConnectedNode(){return connNode;}
-    public void setConnectedNode(Node connNode){
-        this.connNode = connNode;
+    
+    public Node getParentNode(){return parentNode;}
+    public void setParentNode(Node parentNode){
+        this.parentNode = parentNode;
+        parentNode.addChild(this);
         // Update stuff?
+        this.updateConnections();
     }
     public Instant getConnectedNodeID(){return connNodeID;}
     public void setConnectedNodeID(Instant connNodeID){this.connNodeID = connNodeID;}
     public String getName(){return name;}
-    public void setName(String name){this.name = name;}
+    public void setName(String name){
+        this.name = name;
+        this.setToolTipText(this.getName());
+    }
     public String getType(){return type;}
     public void setType(String type){this.type = type;}
     public List<String> getFormulas(){return formulas;}
     public void appendFormulas(String form){formulas.add(form);}
     public void setFormulas(List<String> formulas){this.formulas = formulas;}
     
+    public void setPanel(GroupSelector select, EditPopupMenu menu){
+        this.select = select;
+        this.actions = select.getActions();
+        this.menu = menu;
+        top = new Connector("Top", select, this);
+        top.updatePosition();
+        top.updatePosition();
+        bottom = new Connector("Bottom", select, this);
+        bottom.updatePosition();
+        bottom.updatePosition();
+            
+        select.add(top);
+        select.add(bottom);
+    }
+    public void updateConnectionPosition(){
+        top.updateConnectionPosition();
+        bottom.updateConnectionPosition();
+    }
+    public void removeConnections(){
+        if(childrenNodes != null){
+            for(Node elem : childrenNodes){
+                elem.removeConnections();
+            }
+        }
+        top.removeConnections();
+        select.remove(top);
+        bottom.removeConnections();
+        select.remove(bottom);
+    }
+    public void updateConnections(){
+        System.out.println(this.getName()+"=>"+this.parentNode.getName());
+        top.setConnParentNode(this.parentNode);
+        bottom.setConnParentNode(this.parentNode);
+    }
     public Connector getClosestConnector(Connector conn){
         if(top.getLocation().distance(conn.getLocation()) > 
             bottom.getLocation().distance(conn.getLocation())){
@@ -107,21 +139,17 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
             return top;
         }
     }
-    public void setPanel(GroupSelector select, EditPopupMenu menu){
-        this.select = select;
-        this.actions = select.getActions();
-        this.menu = menu;
+    public void addChild(Node child){
+        if(childrenNodes == null){
+            childrenNodes = new ArrayList<>();
+        }
+        childrenNodes.add(child);
     }
-    public void removeConnections(){
-        if(connectedTo != null){
-            connectedTo.removeConnected();
-        }
-        if(top != null){
-            top.removeConnections();
-            select.remove(top);
-            bottom.removeConnections();
-            select.remove(bottom);
-        }
+    public void removeChild(Node child){
+        childrenNodes.remove(child);
+    }
+    public List getChildren(){
+        return childrenNodes;
     }
     /**
      * Zooms in and out in accordance with mouse scroll wheel
@@ -137,14 +165,14 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
             }
         }
         this.setSize(getZoomedSize(getX(),getY()));
-        if(top != null){
-            top.updatePosition();
-            top.updatePosition();
-            bottom.updatePosition();
-            bottom.updatePosition();
-        }
-        if(connectedTo != null){
-            connectedTo.updateConnectionPosition();
+        top.updatePosition();
+        top.updatePosition();
+        bottom.updatePosition();
+        bottom.updatePosition();
+        if(childrenNodes != null){
+            for(Node elem : childrenNodes){
+                elem.updateConnectionPosition();
+            }
         }
         select.repaint();
     }
@@ -184,36 +212,21 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
                     }
                 }
             }
-            if(top != null){
-                top.updatePosition();
-                bottom.updatePosition();
-            }
-            if(connectedTo != null){
-                connectedTo.updateConnectionPosition();
+            top.updatePosition();
+            bottom.updatePosition();
+            if(childrenNodes != null){
+                for(Node elem : childrenNodes){
+                    elem.updateConnectionPosition();
+                }
             }
             menu.setVisible(false);
             select.repaint();
         }
     } 
     @Override
-    public void mouseExited(MouseEvent e){
-        select.repaint();
-    }
+    public void mouseExited(MouseEvent e){}
     @Override
-    public void mouseEntered(MouseEvent e){
-        if(top == null){
-            top = new Connector("Top", select, this);
-            top.updatePosition();
-            top.updatePosition();
-            bottom = new Connector("Bottom", select, this);
-            bottom.updatePosition();
-            bottom.updatePosition();
-            
-            select.add(top);
-            select.add(bottom);
-            select.repaint();
-        }
-    }
+    public void mouseEntered(MouseEvent e){}
     @Override
     public void mouseReleased(MouseEvent e){
         myX = getX();
@@ -273,12 +286,12 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     public void shiftLocation(int deltaX, int deltaY){
         
         this.setLocation(this.myX + deltaX, this.myY + deltaY);
-        if(top != null){
-            top.updatePosition();
-            bottom.updatePosition();
-        }
-        if(connectedTo != null){
-            connectedTo.updateConnectionPosition();
+        top.updatePosition();
+        bottom.updatePosition();
+        if(childrenNodes != null){
+            for(Node elem : childrenNodes){
+                elem.updateConnectionPosition();
+            }
         }
         menu.setVisible(false);
     }

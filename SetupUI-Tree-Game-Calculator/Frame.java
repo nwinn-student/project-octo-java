@@ -3,12 +3,11 @@
  * The Frame class has a MenuBar, ToolBar, and GroupSelector,
  * which in turn have their own functionality.
  * 
- * The Frame class is planned to not be a fixed size, 750x750, but instead be
- * 50% height and 50% width of the screen, updating when the screen display size
+ * The Frame class is planned update when the screen display size
  * changes, it will still be resizable.
  *
  * @author Noah Winn
- * @version 5/31/2024
+ * @version 6/2/2024
  */
 
 import java.awt.Color;
@@ -27,7 +26,6 @@ public class Frame extends JFrame implements WindowListener{
     public Frame(){
         
     }
-    
     /**
      * An example of a method - replace this comment with your own
      */
