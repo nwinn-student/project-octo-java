@@ -18,7 +18,7 @@ import java.util.Arrays;
  * and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 6/2/2024
+ * @version 6/3/2024
  */
 
 
@@ -66,7 +66,7 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         panVert.setLayout(null);
         panVert.setBackground(Color.blue);
         panHori.setLayout(null);
-        panHori.setBackground(Color.blue);
+        panHori.setBackground(new Color(135,135,255));
         select.add(panVert);
         select.add(panHori);
     }
@@ -183,6 +183,9 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
     }
     @Override
     public void mouseReleased(MouseEvent e){
+        if (connParentNode != null){
+            connParentNode.removeChild(this.parentNode);
+        }
         //isConnected = true; // fixed for testing
         if(!isConnected){
             // Look at distance, if too far away then remove
@@ -197,22 +200,19 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
                             } else {
                                 connParentNode = (Node) elem;
                             }
-                            System.out.println(connParentNode.getName()+"<="+this.parentNode.getName());
-                            
                             this.parentNode.setParentNode(connParentNode);
-                            updateConnectionPosition();
-                            isConnected = true;
-                            panVert.setVisible(true);
-                            panHori.setVisible(true);
+                            if(this.parentNode.getParentNode() == connParentNode){
+                                updateConnectionPosition();
+                                isConnected = true;
+                                panVert.setVisible(true);
+                                panHori.setVisible(true);
+                            }
                             break;
                         }
                     }
                 }
             }
             if(!isConnected){
-                if(connParentNode != null){
-                    connParentNode.setParentNode(this.parentNode);
-                }
                 panVert.setVisible(false);
                 panHori.setVisible(false);
             }

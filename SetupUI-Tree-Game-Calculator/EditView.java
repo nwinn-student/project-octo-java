@@ -12,13 +12,14 @@ import java.awt.event.MouseListener;
  * Write a description of class EditView here.
  *
  * @author Noah Winn
- * @version 6/2/2024
+ * @version 6/3/2024
  */
 public class EditView extends JInternalFrame implements ActionListener, MouseListener{
     private GroupSelector pan = null;
     private JTextField header = null;
     private JTextField type = null;
     private JTextField connectedTo = null;
+    private JTextField childrenTo = null;
     private JButton formulaAdder = null;
     private JButton submit = null;
     
@@ -34,33 +35,39 @@ public class EditView extends JInternalFrame implements ActionListener, MouseLis
         this.setLocation((int)pan.getSize().getWidth()-(int)pan.getSize().getWidth()/4, 0);
         this.addMouseListener(this);
         JLabel headerLabel = new JLabel("Name:");
-        headerLabel.setBounds(0,0,this.getWidth()/3,this.getHeight()/15);
+        headerLabel.setBounds(0,0,getWidth()/3,getHeight()/15);
         header = new JTextField("Enter name here..");
         header.setToolTipText("Name");
-        header.setBounds(this.getWidth()/3,0,2*this.getWidth()/3,this.getHeight()/15);
+        header.setBounds(getWidth()/3,0,2*getWidth()/3,getHeight()/15);
         header.setFocusable(false);
         JSeparator sep = new JSeparator();
-        sep.setBounds(0,this.getHeight()/15, this.getWidth(), this.getHeight());
+        sep.setBounds(0,getHeight()/15, getWidth(), getHeight());
         JLabel typeLabel = new JLabel("Type:");
-        typeLabel.setBounds(0,this.getHeight()/15,this.getWidth()/3,this.getHeight()/15);
+        typeLabel.setBounds(0,getHeight()/15,getWidth()/3,getHeight()/15);
         type = new JTextField("Enter type here..");
-        type.setBounds(this.getWidth()/3,this.getHeight()/15,2*this.getWidth()/3,this.getHeight()/15);
+        type.setBounds(getWidth()/3,getHeight()/15,2*getWidth()/3,getHeight()/15);
         type.setFocusable(false);
         type.setToolTipText("Type");
         JSeparator sep2 = new JSeparator();
-        sep2.setBounds(0,2*this.getHeight()/15, this.getWidth(), this.getHeight());
+        sep2.setBounds(0,2*getHeight()/15, getWidth(), getHeight());
         JLabel connectedLabel = new JLabel("Parent:");
-        connectedLabel.setBounds(0,2*this.getHeight()/15, this.getWidth(), this.getHeight()/15);
+        connectedLabel.setBounds(0,2*getHeight()/15, getWidth(), getHeight()/15);
         connectedTo = new JTextField("Enter node name here..");
-        connectedTo.setBounds(this.getWidth()/3,2*this.getHeight()/15, 2*this.getWidth()/3, this.getHeight()/15);
+        connectedTo.setBounds(getWidth()/3,2*getHeight()/15, 2*getWidth()/3, getHeight()/15);
         connectedTo.setEditable(false);
         connectedTo.setFocusable(false);
+        JLabel childrenLabel = new JLabel("Children:");
+        childrenLabel.setBounds(0,getHeight()/5, getWidth(), getHeight()/15);
+        childrenTo = new JTextField("[null]");
+        childrenTo.setBounds(getWidth()/3, getHeight()/5, 2*getWidth()/3, getHeight()/15);
+        childrenTo.setEditable(false);
+        childrenTo.setFocusable(false);
         formulaAdder = new JButton("Add Formula");
-        formulaAdder.setBounds(this.getWidth()/4, this.getHeight()/5, this.getWidth()/2, this.getHeight()/15);
+        formulaAdder.setBounds(getWidth()/4, 4*getHeight()/15, getWidth()/2, getHeight()/15);
         formulaAdder.addActionListener(this);
         formulaAdder.setFocusable(false);
         submit = new JButton("Submit");
-        submit.setBounds(this.getWidth()/4, this.getHeight()/2, this.getWidth()/2, this.getHeight()/15);
+        submit.setBounds(getWidth()/4, getHeight()/2, getWidth()/2, getHeight()/15);
         submit.addActionListener(this);
         submit.setFocusable(false);
         this.add(headerLabel);
@@ -71,6 +78,8 @@ public class EditView extends JInternalFrame implements ActionListener, MouseLis
         this.add(sep2);
         this.add(connectedLabel);
         this.add(connectedTo);
+        this.add(childrenLabel);
+        this.add(childrenTo);
         //this.add(formulaAdder);
         this.add(submit);
     }
@@ -84,8 +93,37 @@ public class EditView extends JInternalFrame implements ActionListener, MouseLis
         type.setText(node.getType());
         if(node.getUniqueID() == node.getParentNode().getUniqueID()) {
             connectedTo.setText("this");
+            if(node.getChildren() == null || node.getChildren().isEmpty()){
+                childrenTo.setText("[null]");
+            } else{
+                String children = "";
+                for(Node elem : node.getChildren()){
+                    children += "["+elem.getName()+"]";
+                }
+                childrenTo.setText(children);
+                String desc = "";
+                for(Node elem : node.getDescendants()){
+                    desc += "["+elem.getName()+"]";
+                }
+                System.out.println(desc);
+            }
         } else {
             connectedTo.setText(node.getParentNode().getName());
+            if(node.getChildren() == null || node.getChildren().isEmpty()){
+                childrenTo.setText("[null]");
+            } else{
+                String children = "";
+                for(Node elem : node.getChildren()){
+                    children += "["+elem.getName()+"]";
+                }
+                childrenTo.setText(children);
+                String desc = "";
+                for(Node elem : node.getDescendants()){
+                    desc += "["+elem.getName()+"]";
+                }
+                System.out.println(desc);
+
+            }
         }
     }
     @Override

@@ -10,13 +10,12 @@ import java.util.List;
 import java.util.Arrays;
 import java.time.Instant;
 import java.util.ArrayList;
-
 /**
  * The Node class has Connector objects attached to it, responding to clicks, 
  * hovers, scrolls, and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 6/2/2024
+ * @version 6/3/2024
  */
 
 
@@ -79,6 +78,15 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     
     public Node getParentNode(){return parentNode;}
     public void setParentNode(Node parentNode){
+        if(getDescendants() != null){
+            for(Node elem : getDescendants()){
+                if(elem.getUniqueID() == parentNode.getUniqueID()){
+                    System.out.println("Broken, a loop occurred.");
+                    return;
+                }
+            }
+        }
+        System.out.println("Parent:"+parentNode);
         this.parentNode = parentNode;
         parentNode.addChild(this);
         // Update stuff?
@@ -127,7 +135,6 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         select.remove(bottom);
     }
     public void updateConnections(){
-        System.out.println(this.getName()+"=>"+this.parentNode.getName());
         top.setConnParentNode(this.parentNode);
         bottom.setConnParentNode(this.parentNode);
     }
@@ -143,13 +150,38 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         if(childrenNodes == null){
             childrenNodes = new ArrayList<>();
         }
+        System.out.println("Added"+child.toString());
         childrenNodes.add(child);
     }
     public void removeChild(Node child){
+        if(childrenNodes == null) {return;}
         childrenNodes.remove(child);
     }
-    public List getChildren(){
+    public List<Node> getChildren(){
         return childrenNodes;
+    }
+    private List<Node> getDescNode(Node node, List<Node> desc){
+        if(desc == null){
+            desc = new ArrayList<>();
+        }
+        if(node.getChildren() == null){
+            return desc;
+        }
+        for(Node elem : node.getChildren()){
+            //String na = elem.getName();
+            desc.add(elem);
+            if(elem.getChildren() != null && !elem.getChildren().isEmpty()){
+                getDescNode(elem, desc);
+            }
+        }
+        if(desc.size() == 0){
+            return desc;
+        }
+        
+        return desc;
+    }
+    public List<Node> getDescendants(){
+        return getDescNode(this, null);
     }
     /**
      * Zooms in and out in accordance with mouse scroll wheel
