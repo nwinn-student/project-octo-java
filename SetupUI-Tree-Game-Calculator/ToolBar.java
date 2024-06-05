@@ -5,7 +5,7 @@
  * the screen.
  *
  * @author Noah Winn
- * @version 6/2/2024
+ * @version 6/5/2024
  */
 import javax.swing.JToolBar;
 import javax.swing.JButton;
@@ -45,7 +45,7 @@ public class ToolBar implements ActionListener{
         this.actions = fram.getActions();
         this.pan = pan;
         this.menu = menu;
-        toolBar = new JToolBar();
+        toolBar = new JToolBar("Toolbar");
         addButton("Create Node", toolBar);
         addButton("Connect Nodes", toolBar);
         addButton("Edit Node", toolBar);
@@ -55,6 +55,7 @@ public class ToolBar implements ActionListener{
         addButton("Copy", toolBar);
         addButton("Cut",toolBar);
         addButton("Paste", toolBar);
+        toolBar.getAccessibleContext().setAccessibleName("Tool Bar");
         fram.add(toolBar, BorderLayout.PAGE_START);
     }
     
@@ -62,6 +63,7 @@ public class ToolBar implements ActionListener{
         JButton button = new JButton(name);
         button.addActionListener(this);
         button.setFocusable(false);
+        button.getAccessibleContext().setAccessibleName(name);
         parent.add(button);
     }
     
@@ -79,7 +81,7 @@ public class ToolBar implements ActionListener{
             fram.repaint();
         }
         else if(e.getActionCommand() == "Connect Nodes"){
-            //CONNECTS selected nodes
+            //CONNECTS selected nodes, remove?
             List<Component> frameElements = Arrays.asList(pan.getComponents());
             List<Component> cElements = new ArrayList<>();
             if(frameElements.size() < 4096){
@@ -95,7 +97,7 @@ public class ToolBar implements ActionListener{
             fram.repaint();
         }
         else if(e.getActionCommand() == "Edit Node"){
-            //EDITS selected nodes
+            //EDITS selected nodes, remove?
             List<Component> frameElements = Arrays.asList(pan.getComponents());
             List<Component> cElements = new ArrayList<>();
             if(frameElements.size() < 4096){
@@ -122,7 +124,7 @@ public class ToolBar implements ActionListener{
                     pan.remove(elem);
                 }
             }
-            actions.addUndoAbleAction("DLM"+cElements.toString());
+            actions.addUndoAbleAction("DLM"+cElements);
             fram.repaint();
         }
         else if(e.getActionCommand() == "Copy"){

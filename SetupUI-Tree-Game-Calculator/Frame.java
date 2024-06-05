@@ -7,7 +7,7 @@
  * changes, it will still be resizable.
  *
  * @author Noah Winn
- * @version 6/2/2024
+ * @version 6/4/2024
  */
 
 import java.awt.Color;
@@ -24,12 +24,13 @@ public class Frame extends JFrame implements WindowListener{
      * Constructor for objects of class Frame
      */
     public Frame(){
-        
+        super("Tree Game Calculator Designer");
     }
     /**
      * An example of a method - replace this comment with your own
      */
     public void initializeFrame(){
+        //this.setTitle(); // For later when user can open files
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setFocusable(false);
         
@@ -48,6 +49,8 @@ public class Frame extends JFrame implements WindowListener{
         
         ToolBar tool = new ToolBar();
         tool.createToolBar(this, pan3, popupMenu);
+        
+        actions.setPanel(pan3, popupMenu);
         
         this.add(pan3);        
         this.setVisible(true);

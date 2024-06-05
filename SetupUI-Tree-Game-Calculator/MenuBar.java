@@ -32,7 +32,7 @@ import java.time.Instant;
  * the screen.
  *
  * @author Noah Winn
- * @version 6/2/2024
+ * @version 6/4/2024
  */
 public class MenuBar implements ActionListener
 {
@@ -280,16 +280,18 @@ public class MenuBar implements ActionListener
             //USE: https://github.com/hneemann/Digital/tree/master/src/main/java/de/neemann/digital/undo
             //https://stackoverflow.com/questions/24433089/jtextarea-settext-undomanager
             try{
-                //undoManager.undo();
+                actions.undo();
             }
             catch(Exception a){}
         }
         if(e.getActionCommand() == "Redo"){
             //https://stackoverflow.com/questions/24433089/jtextarea-settext-undomanager
             try{
-                //undoManager.redo();
+                actions.redo();
             }
-            catch(Exception a){}
+            catch(Exception a){
+                System.out.println(a);
+            }
         }
         if(e.getActionCommand() == "Duplicate"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
@@ -453,8 +455,8 @@ public class MenuBar implements ActionListener
             p.setPanel(pan, menu);
             p.setName("#"+nodeIndex.toString());
             nodeIndex++;
+            actions.addUndoAbleAction("MKS"+p.toString());
             pan.add(p);
-            fram.repaint();
             fram.repaint();
         }
         if(e.getActionCommand() == "Remove Game Node"){
