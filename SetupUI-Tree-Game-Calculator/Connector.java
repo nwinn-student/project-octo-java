@@ -18,7 +18,7 @@ import java.util.Arrays;
  * and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 6/3/2024
+ * @version 6/6/2024
  */
 
 
@@ -94,26 +94,17 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         if(pos.equals("Top")){
             this.setBounds((width-curWidth)/2 + positionX,positionY-height/10, height/10, width/10);
             connectToPoint();
-        }
-        else if(pos.equals("Left")){
-            //this.setBounds(positionX-width/10,(height-curHeight)/2 + positionY, height/10, width/10);
-        }
-        else if(pos.equals("Right")){
-            //this.setBounds(width-curWidth + positionX + width/10,(height-curHeight)/2 + positionY, height/10, width/10);
-        }
-        else if(pos.equals("Bottom")){
+        } else if (pos.equals("Bottom")){
             this.setBounds((width-curWidth)/2 + positionX,height-curHeight + positionY+height/10, height/10, width/10);
             connectToPoint();
         }
-        
-        //this.setBounds(height, width, 5,5);
         select.repaint();
-        //this.repaint();
     }
     public void updateConnectionPosition(){
-        //System.out.println("Updating Connection...");
-        point = connParentNode.getClosestConnector(this).getLocation();
-        connectToPoint();
+        if(connParentNode != null){
+            point = connParentNode.getClosestConnector(this).getLocation();
+            connectToPoint();
+        }
     }
     public void removeConnections(){
         select.remove(panHori);
@@ -174,13 +165,9 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         
     } 
     @Override
-    public void mouseExited(MouseEvent e){
-        
-    }
+    public void mouseExited(MouseEvent e){}
     @Override
-    public void mouseEntered(MouseEvent e){
-        
-    }
+    public void mouseEntered(MouseEvent e){}
     @Override
     public void mouseReleased(MouseEvent e){
         if (connParentNode != null){
@@ -220,9 +207,7 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         }
     }
     @Override
-    public void mouseClicked(MouseEvent e){
-        
-    }
+    public void mouseClicked(MouseEvent e){}
     @Override
     public void mouseMoved(MouseEvent e){}
     private boolean fallsInside(Rectangle a, Rectangle b){
@@ -248,8 +233,7 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
             else{
                 panHori.setBounds(myX, 0, 0, h);
             }
-        }
-        else if(pos.equals("Bottom")){
+        } else if (pos.equals("Bottom")){
             int h = (int)this.getSize().getHeight();
             int w = (int)this.getSize().getWidth();
             myX = getX();
@@ -264,8 +248,6 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
                 panHori.setBounds((int)point.getX(), myY+pointY, Math.abs(pointX), h);
             else
                 panHori.setBounds(myX, 0, 0, 0);
-                
         }
-        
     }
 }

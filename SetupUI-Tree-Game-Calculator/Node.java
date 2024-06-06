@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * hovers, scrolls, and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 6/3/2024
+ * @version 6/6/2024
  */
 
 
@@ -86,11 +86,12 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
                 }
             }
         }
-        System.out.println("Parent:"+parentNode);
+        //System.out.println("Parent:"+parentNode);
         this.parentNode = parentNode;
         parentNode.addChild(this);
         // Update stuff?
         this.updateConnections();
+        this.updateConnectionPosition();
     }
     public Instant getConnectedNodeID(){return connNodeID;}
     public void setConnectedNodeID(Instant connNodeID){this.connNodeID = connNodeID;}
@@ -120,6 +121,8 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         select.add(bottom);
     }
     public void updateConnectionPosition(){
+        top.updatePosition();
+        bottom.updatePosition();
         top.updateConnectionPosition();
         bottom.updateConnectionPosition();
     }
@@ -142,9 +145,7 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         if(top.getLocation().distance(conn.getLocation()) > 
             bottom.getLocation().distance(conn.getLocation())){
             return bottom;
-        } else {
-            return top;
-        }
+        } else {return top;}
     }
     public void addChild(Node child){
         if(childrenNodes == null){
@@ -164,20 +165,15 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         if(desc == null){
             desc = new ArrayList<>();
         }
-        if(node.getChildren() == null){
-            return desc;
-        }
-        for(Node elem : node.getChildren()){
+        if (node.getChildren() == null){return desc;} 
+            for(Node elem : node.getChildren()){
             //String na = elem.getName();
             desc.add(elem);
             if(elem.getChildren() != null && !elem.getChildren().isEmpty()){
                 getDescNode(elem, desc);
             }
         }
-        if(desc.size() == 0){
-            return desc;
-        }
-        
+        if(desc.size() == 0){return desc;}
         return desc;
     }
     public List<Node> getDescendants(){
@@ -186,6 +182,7 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     /**
      * Zooms in and out in accordance with mouse scroll wheel
      */
+    @Override
     public void mouseWheelMoved(MouseWheelEvent e){
         if(e.getWheelRotation() > 0){
             if(currentZoom > minZoom){
@@ -208,6 +205,7 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         }
         select.repaint();
     }
+    @Override
     public void mousePressed(MouseEvent e){
         screenX = e.getXOnScreen();
         screenY = e.getYOnScreen();
@@ -264,17 +262,19 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         myX = getX();
         myY = getY();
         if(this.getForeground() == Color.red){
-            // Move other selected pieces, should this item be selected?
             List<Component> frameElements = Arrays.asList(select.getComponents());
+            List<Component> cElements = new ArrayList<>();
             if(frameElements.size() < 4096){
                 for(Component elem : frameElements){
                     if(elem.getForeground() == Color.red && elem != this){
                         Node p = (Node) elem;
                         p.updateLocation();
+                        cElements.add(p);
                     }
                 }
             }
-        }
+            actions.addUndoAbleAction("MOV"+cElements); // ?
+        } else {actions.addUndoAbleAction("MOV"+this);}
     }
     @Override
     public void mouseClicked(MouseEvent e){

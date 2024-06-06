@@ -7,7 +7,7 @@
  * changes, it will still be resizable.
  *
  * @author Noah Winn
- * @version 6/4/2024
+ * @version 6/6/2024
  */
 
 import java.awt.Color;
@@ -16,6 +16,7 @@ import java.awt.event.WindowListener;
 import java.awt.event.WindowEvent;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+
 public class Frame extends JFrame implements WindowListener{
     // instance variables
     private EditPopupMenu popupMenu = new EditPopupMenu();
@@ -32,8 +33,6 @@ public class Frame extends JFrame implements WindowListener{
     public void initializeFrame(){
         //this.setTitle(); // For later when user can open files
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setFocusable(false);
-        
         int inset = 120;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         this.setSize(screenSize.width - inset*4,screenSize.height - inset*2);

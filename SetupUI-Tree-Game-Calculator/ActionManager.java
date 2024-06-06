@@ -13,7 +13,7 @@ import java.awt.Component;
  * edits to be used.
  *
  * @author Noah Winn
- * @version 6/5/2024
+ * @version 6/6/2024
  */
 public class ActionManager {
     private final short MAX_SIZE = 512;
@@ -49,7 +49,7 @@ public class ActionManager {
          *    mouseRelease, or editting (name, connectedTo, desc, or formulas).
          * Nodes have their own uniqueIDs, so we look for that first.
          */
-        //System.out.println("h:"+action);
+        //System.out.println(action);
         // Look at first 3
         if(isUndo){
             if(action.substring(0,3).equals("MKS")){
@@ -77,10 +77,9 @@ public class ActionManager {
             } else if (action.substring(0,3).equals("DLM")) {
                 // Adding
                 List<String> comp = Arrays.asList(action.substring(3,action.length()-1).replaceAll("],","] ,").split(" ,"));
-                List<Node> connCheck = null;
+                List<Node> connCheck = new ArrayList<>();
                 for(String elem : comp){
                     String line = elem.substring(1,elem.length()-1);
-                    //System.out.println(line);
                     char[] field = line.toCharArray();
                     int i;
                     for(i = 0; i < field.length; i++){
@@ -116,8 +115,8 @@ public class ActionManager {
                             Integer.parseInt(crd[6]),Integer.parseInt(crd[7])
                             );
                         //Formulas...
-                        
                         p.updateZoom();
+                        p.updateConnectionPosition();
                         undoAblePanel.add(p);
                     }
                 }
@@ -132,7 +131,10 @@ public class ActionManager {
                         }
                     }
                 }
+            } else if (action.substring(0,3).equals("MOV")){
+                // Move back
             }
+        
         } else {
             if(action.substring(0,3).equals("MKS")){
                 // Adding
@@ -188,8 +190,34 @@ public class ActionManager {
                     }
                 }
             } else if (action.substring(0,3).equals("DLM")) {
-                
+                // Remove
+                List<String> comp = Arrays.asList(action.substring(3,action.length()-1).replaceAll("],","] ,").split(" ,"));
+                for(String elem : comp){
+                    String line = elem.substring(1,elem.length()-1);
+                    char[] field = line.toCharArray();
+                    int i;
+                    for(i = 0; i < field.length; i++){
+                        if(field[i] == '['){
+                            break;
+                        }
+                    }
+                    line = line.substring(i+1);
+                    String[] crd = line.split(",");
+                    List<Component> frameElements = Arrays.asList(undoAblePanel.getComponents());
+                    for(Component framE : frameElements){
+                        if(framE.getClass().equals(Node.class)){
+                            if(((Node)framE).getUniqueID().equals(Instant.parse(crd[0]))){
+                                Node p = (Node) framE;
+                                p.removeConnections();
+                                undoAblePanel.remove(framE);
+                            }
+                        }
+                    }
+                }
+            } else if (action.substring(0,3).equals("MOV")){
+                // Move forward
             }
+            
         }
     }
     private void updateLists(){

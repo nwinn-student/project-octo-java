@@ -5,7 +5,7 @@
  * the screen.
  *
  * @author Noah Winn
- * @version 6/5/2024
+ * @version 6/6/2024
  */
 import javax.swing.JToolBar;
 import javax.swing.JButton;
@@ -46,24 +46,24 @@ public class ToolBar implements ActionListener{
         this.pan = pan;
         this.menu = menu;
         toolBar = new JToolBar("Toolbar");
-        addButton("Create Node", toolBar);
-        addButton("Connect Nodes", toolBar);
-        addButton("Edit Node", toolBar);
-        addButton("Delete Node", toolBar);
-        addButton("Run", toolBar);
+        addButton("Create Node", toolBar, "Spawns in a new node at 0,0.");
+        addButton("Edit Node", toolBar, "..."); // no clue yet
+        addButton("Delete Node", toolBar, "Use Delete to use Delete Node, removes all of the currently selected nodes.");
+        addButton("Run", toolBar, "..."); // Displays whether or not the inputs will work with Tree-Calculator
         toolBar.addSeparator();
-        addButton("Copy", toolBar);
-        addButton("Cut",toolBar);
-        addButton("Paste", toolBar);
+        addButton("Copy", toolBar, "Use Control-C to use Copy, copies the currently selected Nodes.");
+        addButton("Cut",toolBar, "Use Control-X to use Cut, copies and removes the currently selected Nodes.");
+        addButton("Paste", toolBar, "Use Control-V to use Paste, pastes in the previously copied or cut nodes.");
         toolBar.getAccessibleContext().setAccessibleName("Tool Bar");
         fram.add(toolBar, BorderLayout.PAGE_START);
     }
     
-    public void addButton(String name, JToolBar parent){
+    public void addButton(String name, JToolBar parent, String description){
         JButton button = new JButton(name);
         button.addActionListener(this);
         button.setFocusable(false);
         button.getAccessibleContext().setAccessibleName(name);
+        button.getAccessibleContext().setAccessibleDescription(description);
         parent.add(button);
     }
     
@@ -71,7 +71,6 @@ public class ToolBar implements ActionListener{
     public void actionPerformed(ActionEvent e){
         menu.setVisible(false);
         if(e.getActionCommand() == "Create Node"){
-            //System.out.println("Creating Node");
             Node p = new Node();
             p.setPanel(pan, menu);
             p.setName(nodeIndex.toString());
@@ -79,9 +78,10 @@ public class ToolBar implements ActionListener{
             actions.addUndoAbleAction("MKS"+p.toString());
             pan.add(p);
             fram.repaint();
-        }
-        else if(e.getActionCommand() == "Connect Nodes"){
+        } else if (e.getActionCommand() == "Connect Nodes"){
             //CONNECTS selected nodes, remove?
+            // Was originally thinking of having the user select a node, 
+            // then press connect nodes and have the next selection become connected
             List<Component> frameElements = Arrays.asList(pan.getComponents());
             List<Component> cElements = new ArrayList<>();
             if(frameElements.size() < 4096){
@@ -91,29 +91,11 @@ public class ToolBar implements ActionListener{
                         cElements.add(elem);
                     }
                 }
-                actions.addUndoAbleAction("CNM"+cElements.toString());
+                //actions.addUndoAbleAction("CNM"+cElements.toString());
             }
             
             fram.repaint();
-        }
-        else if(e.getActionCommand() == "Edit Node"){
-            //EDITS selected nodes, remove?
-            List<Component> frameElements = Arrays.asList(pan.getComponents());
-            List<Component> cElements = new ArrayList<>();
-            if(frameElements.size() < 4096){
-                for(Component elem : frameElements){
-                    if(elem.getForeground() == Color.red){
-                        //Selected nodes have been obtained now open editor UI
-                        //for each one?
-                        cElements.add(elem);
-                    }
-                }
-                // to state before edit
-                actions.addUndoAbleAction("EDM"+cElements.toString());
-            }
-            fram.repaint();
-        }
-        else if(e.getActionCommand() == "Delete Node"){
+        } else if (e.getActionCommand() == "Delete Node"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
             List<Component> cElements = new ArrayList<>();
             for(Component elem : frameElements){
@@ -124,7 +106,8 @@ public class ToolBar implements ActionListener{
                     pan.remove(elem);
                 }
             }
-            actions.addUndoAbleAction("DLM"+cElements);
+            if(!cElements.isEmpty())
+                actions.addUndoAbleAction("DLM"+cElements);
             fram.repaint();
         }
         else if(e.getActionCommand() == "Copy"){
@@ -150,7 +133,7 @@ public class ToolBar implements ActionListener{
         }
         else if(e.getActionCommand() == "Cut"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
-            //Clear clipboard.txt
+            List<Component> cElements = new ArrayList<>();
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
                 if(frameElements.size() < 4096){
@@ -159,14 +142,17 @@ public class ToolBar implements ActionListener{
                             Node p = (Node) elem;
                             p.setBorder(blackBorder);
                             p.setForeground(Color.black);
+                            cElements.add(p);
                             out.println(elem);
                             p.removeConnections();
                             pan.remove(elem);
                         }
                     }
                 }
-                fram.repaint();
                 out.close();
+                if(!cElements.isEmpty())
+                    actions.addUndoAbleAction("DLM"+cElements);                fram.repaint();
+                
             }
             catch(Exception a){}
         }
@@ -185,11 +171,9 @@ public class ToolBar implements ActionListener{
                     }
                     // EXPECT EITHER "Panel" or "Connector"
                     if(line.substring(0,i).equals("Node")){
-                        
                         Node p = new Node();
                         p.setPanel(pan, menu);
                         line = line.substring(i+1, line.length()-1);
-                        //System.out.println(line);
                         
                         String[] crd = line.split(",");
                         p.setUniqueID(Instant.parse(crd[0]));
@@ -207,7 +191,6 @@ public class ToolBar implements ActionListener{
                                     }
                                 }
                             }
-                            
                             if(none){
                                 p.setConnectedNodeID(Instant.parse(crd[3]));
                                 connCheck.add(p);
@@ -226,6 +209,7 @@ public class ToolBar implements ActionListener{
                         int shiftY = p.getY() + (int)p.getSize().getHeight()/5;
                         p.setLocation(shiftX, shiftY);
                         p.updateZoom();
+                        p.updateConnectionPosition();
                         pan.add(p);
                     }
                     else if(line.substring(0,i).equals("Connector")){
@@ -240,11 +224,13 @@ public class ToolBar implements ActionListener{
                             Node z = (Node)elem;
                             if(z.getUniqueID().equals(nod.getConnectedNodeID())){
                                 nod.setParentNode(z);
+                                nod.updateConnectionPosition();
                             }
                         }
                     }
                 }
                 fram.repaint();
+                // add Action.
             }
             catch(Exception a){}
         }

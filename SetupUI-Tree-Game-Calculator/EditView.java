@@ -12,7 +12,7 @@ import java.awt.event.MouseListener;
  * Write a description of class EditView here.
  *
  * @author Noah Winn
- * @version 6/3/2024
+ * @version 6/6/2024
  */
 public class EditView extends JInternalFrame implements ActionListener, MouseListener{
     private GroupSelector pan = null;
@@ -159,7 +159,6 @@ public class EditView extends JInternalFrame implements ActionListener, MouseLis
     @Override
     public void mouseReleased(MouseEvent e){}
     public boolean isWithin(MouseEvent e){
-        // work on later
         if(e.getX() < 0 || e.getX() >= this.getWidth()){
             return false;
         }

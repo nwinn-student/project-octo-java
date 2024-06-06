@@ -32,7 +32,7 @@ import java.time.Instant;
  * the screen.
  *
  * @author Noah Winn
- * @version 6/4/2024
+ * @version 6/6/2024
  */
 public class MenuBar implements ActionListener
 {
@@ -58,51 +58,50 @@ public class MenuBar implements ActionListener
         this.menu = menu;
         menuBar = new JMenuBar();
         
-        fileMenu = addMenu("File", menuBar, KeyEvent.VK_F); //ALT-F
-        editMenu = addMenu("Edit", menuBar, KeyEvent.VK_E); //ALT-E
-        viewMenu = addMenu("View", menuBar, KeyEvent.VK_V); //ALT-V
-        testMenu = addMenu("Test", menuBar, KeyEvent.VK_T); //ALT-T
-        nodeMenu = addMenu("Node", menuBar, KeyEvent.VK_N); //ALT-N
-        helpMenu = addMenu("Help", menuBar, KeyEvent.VK_H); //ALT-H
+        fileMenu = addMenu("File", menuBar, KeyEvent.VK_F, "Use Alt-F to select File."); //ALT-F
+        editMenu = addMenu("Edit", menuBar, KeyEvent.VK_E, "Use Alt-E to select Edit."); //ALT-E
+        viewMenu = addMenu("View", menuBar, KeyEvent.VK_V, "Use Alt-V to select View."); //ALT-V
+        testMenu = addMenu("Test", menuBar, KeyEvent.VK_T, "Use Alt-T to select Test."); //ALT-T
+        nodeMenu = addMenu("Node", menuBar, KeyEvent.VK_N, "Use Alt-N to select Node."); //ALT-N
+        helpMenu = addMenu("Help", menuBar, KeyEvent.VK_H, "Use Alt-H to select Help."); //ALT-H
         
         LookAndFeelMenu.createLookAndFeelMenuItem(viewMenu,fram);
         
-        addMenuItem("New", fileMenu, KeyEvent.VK_N); // CTRL N
-        addMenuItem("Open", fileMenu, KeyEvent.VK_O); // CTRL O
-        //addMenuItem("Load in new window", fileMenu, 0);
-        addMenuItem("Save", fileMenu, KeyEvent.VK_S); // CTRL S
-        addMenuItem("Save as..", fileMenu, 0); 
-        addMenuItem("Export", fileMenu, 0);
+        addMenuItem("New", fileMenu, KeyEvent.VK_N, "Use Control-N to use New, creates a new file."); // CTRL N
+        addMenuItem("Open", fileMenu, KeyEvent.VK_O, "Use Control-O to use Open, opens up a file selector, then the selected file in the current window."); // CTRL O
+        addMenuItem("Save", fileMenu, KeyEvent.VK_S, "Use Control-S to use Save, ..."); // CTRL S
+        addMenuItem("Save as", fileMenu, 0, "..."); 
+        addMenuItem("Export", fileMenu, 0, "...");
         //addMenuItem("Print", fileMenu, KeyEvent.VK_P); // CTRL P
-        addMenuItem("Exit", fileMenu, KeyEvent.VK_Q); // CTRL Q
+        addMenuItem("Exit", fileMenu, KeyEvent.VK_Q, "Use Control-Q to use Exit, closes the current window."); // CTRL Q
         
-        addMenuItem("Undo", editMenu, KeyEvent.VK_Z); // CTRL Z
-        addMenuItem("Redo", editMenu, KeyEvent.VK_Y); // CTRL Y
-        addMenuItem("Duplicate", editMenu, KeyEvent.VK_D); //CTRL D
-        addMenuItem("Copy", editMenu, KeyEvent.VK_C); // CTRL C
-        addMenuItem("Cut", editMenu, KeyEvent.VK_X); // CTRL X
-        addMenuItem("Paste", editMenu, KeyEvent.VK_V); // CTRL V
-        addMenuItem("Find", editMenu, KeyEvent.VK_F); // CTRL F
-        addMenuItem("Settings", editMenu, KeyEvent.VK_COMMA); // CTRL ,
+        addMenuItem("Undo", editMenu, KeyEvent.VK_Z, "Use Control-Z to use Undo, undoes the previous action."); // CTRL Z
+        addMenuItem("Redo", editMenu, KeyEvent.VK_Y, "Use Control-Y to use Redo, redoes the previous undone action."); // CTRL Y
+        addMenuItem("Duplicate", editMenu, KeyEvent.VK_D, "Use Control-D to use Duplicate, duplicates the selected nodes."); //CTRL D
+        addMenuItem("Copy", editMenu, KeyEvent.VK_C, "Use Control-C to use Copy, copies the currently selected nodes."); // CTRL C
+        addMenuItem("Cut", editMenu, KeyEvent.VK_X, "Use Control-X to use Cut, copies and removes the currently selected nodes."); // CTRL X
+        addMenuItem("Paste", editMenu, KeyEvent.VK_V, "Use Control-V to use Paste, pastes in the previously copied or cut nodes."); // CTRL V
+        addMenuItem("Find", editMenu, KeyEvent.VK_F, "Use Control-F to use Find, ..."); // CTRL F
+        addMenuItem("Settings", editMenu, KeyEvent.VK_COMMA, "Use Control-Comma to use Settings, ..."); // CTRL ,
         
-        addMenuItem("Fit Window", viewMenu, 0);
-        addMenuItem("Zoom In", viewMenu, KeyEvent.VK_PLUS);
-        addMenuItem("Zoom Out", viewMenu, KeyEvent.VK_MINUS);
-        addMenuItem("Set Scaling..", viewMenu, 0);
-        addMenuItem("View as..", viewMenu, 0);
-        addMenuItem("Tutorial", viewMenu, 0); //goes thru it
+        addMenuItem("Fit Window", viewMenu, 0, "...");
+        addMenuItem("Zoom In", viewMenu, KeyEvent.VK_PLUS, "Use Control-Plus to use Zoom In, ...");
+        addMenuItem("Zoom Out", viewMenu, KeyEvent.VK_MINUS, "Use Control-Minus to use Zoom Out, ...");
+        addMenuItem("Set Scaling", viewMenu, 0, "...");
+        addMenuItem("View as", viewMenu, 0, "...");
+        addMenuItem("Tutorial", viewMenu, 0, "..."); //goes thru it
         
-        addMenuItem("Verify", testMenu, 0); //checks formulas, or trees
-        addMenuItem("Display Sample Formula", testMenu, 0);
-        addMenuItem("Display Sample Tree", testMenu, 0);
+        addMenuItem("Verify", testMenu, 0, "..."); //checks formulas, or trees
+        addMenuItem("Display Sample Formula", testMenu, 0, "...");
+        addMenuItem("Display Sample Tree", testMenu, 0, "...");
         
-        addMenuItem("Add Game Node", nodeMenu, 0);
-        addMenuItem("Remove Game Node", nodeMenu, KeyEvent.VK_DELETE);
-        addMenuItem("Remove All Node", nodeMenu, 0);
+        addMenuItem("Add Game Node", nodeMenu, 0, "Creates a new node.");
+        addMenuItem("Remove Game Node", nodeMenu, KeyEvent.VK_DELETE, "Use Delete to use Remove Game Node, deletes the currently selected nodes.");
+        addMenuItem("Remove All Node", nodeMenu, 0, "Deletes all of the current nodes on the screen.");
         
-        addMenuItem("Components", helpMenu, 0);
-        addMenuItem("Documentation", helpMenu, 0);
-        addMenuItem("About", helpMenu, 0);
+        addMenuItem("Components", helpMenu, 0, "...");
+        addMenuItem("Documentation", helpMenu, 0, "...");
+        addMenuItem("About", helpMenu, 0, "...");
         
         fram.setJMenuBar(menuBar);
     }
@@ -110,19 +109,21 @@ public class MenuBar implements ActionListener
     /**
      * Constructor for objects of class Frame
      */
-    private JMenu addMenu(String title, JMenuBar parent, int key){
+    private JMenu addMenu(String title, JMenuBar parent, int key, String description){
         JMenu menu = new JMenu(title);
         if(key != 0){
              //Key is not undefined
             menu.setMnemonic(key);
         }
+        menu.getAccessibleContext().setAccessibleName(title);
+        menu.getAccessibleContext().setAccessibleDescription(description);
         parent.add(menu);
         return menu;
     }
     /**
      * Constructor for objects of class Frame
      */
-    private void addMenuItem(String title, JMenu parent, int key){
+    private void addMenuItem(String title, JMenu parent, int key, String description){
         JMenuItem menuItem = new JMenuItem(title);
         if(key != 0){
             if(title.equals("Remove Game Node")){
@@ -134,6 +135,8 @@ public class MenuBar implements ActionListener
             }
         }
         menuItem.addActionListener(this);
+        menuItem.getAccessibleContext().setAccessibleName(title);
+        menuItem.getAccessibleContext().setAccessibleDescription(description);
         parent.add(menuItem);
     }
     
@@ -270,30 +273,19 @@ public class MenuBar implements ActionListener
                 System.out.println(file);
             }
         }
-        if(e.getActionCommand() == "Export"){}
-        if(e.getActionCommand() == "Exit"){
-            //Ask if they want to save
+        else if (e.getActionCommand() == "Export"){}
+        else if (e.getActionCommand() == "Exit"){
+            //Ask if they want to save? Force save if already existing?
             System.exit(0);
         }
         
-        if(e.getActionCommand() == "Undo"){
-            //USE: https://github.com/hneemann/Digital/tree/master/src/main/java/de/neemann/digital/undo
-            //https://stackoverflow.com/questions/24433089/jtextarea-settext-undomanager
-            try{
-                actions.undo();
-            }
-            catch(Exception a){}
-        }
-        if(e.getActionCommand() == "Redo"){
-            //https://stackoverflow.com/questions/24433089/jtextarea-settext-undomanager
-            try{
-                actions.redo();
-            }
-            catch(Exception a){
-                System.out.println(a);
-            }
-        }
-        if(e.getActionCommand() == "Duplicate"){
+        else if (e.getActionCommand() == "Undo"){
+            try {actions.undo();}
+            catch(Exception a) {System.out.println(a);}
+        } else if (e.getActionCommand() == "Redo"){
+            try {actions.redo();}
+            catch(Exception a) {System.out.println(a);}
+        } else if (e.getActionCommand() == "Duplicate"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
             if(frameElements.size() < 4096){
                 for(Component elem : frameElements){
@@ -313,13 +305,10 @@ public class MenuBar implements ActionListener
                 }
             }
             fram.repaint();
-        }
-        if(e.getActionCommand() == "Copy"){
+        } else if (e.getActionCommand() == "Copy"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
-            //Clear clipboard.txt
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
-                // Don't want to take up too much memory
                 if(frameElements.size() < 4096){
                     for(Component elem : frameElements){
                         if(elem.getForeground() == Color.red){
@@ -334,10 +323,9 @@ public class MenuBar implements ActionListener
                 out.close();
             }
             catch(Exception a){}
-        }
-        if(e.getActionCommand() == "Cut"){
+        } else if (e.getActionCommand() == "Cut"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
-            //Clear clipboard.txt
+            List<Component> cElements = new ArrayList<>();
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
                 if(frameElements.size() < 4096){
@@ -346,19 +334,20 @@ public class MenuBar implements ActionListener
                             Node p = (Node) elem;
                             p.setBorder(blackBorder);
                             p.setForeground(Color.black);
+                            cElements.add(p);
                             out.println(elem);
                             p.removeConnections();
                             pan.remove(elem);
                         }
                     }
                 }
-                fram.repaint();
                 out.close();
+                if(!cElements.isEmpty())
+                    actions.addUndoAbleAction("DLM"+cElements);
+                fram.repaint();
             }
             catch(Exception a){}
-        }
-        if(e.getActionCommand() == "Paste"){
-            //Create c[i] and add it to pan
+        } else if (e.getActionCommand() == "Paste"){
             try{
                 Scanner scan = new Scanner(new File("clipboard.txt"));
                 List<Node> connCheck = new ArrayList<>();
@@ -373,16 +362,14 @@ public class MenuBar implements ActionListener
                     }
                     // EXPECT EITHER "Panel" or "Connector"
                     if(line.substring(0,i).equals("Node")){
-                        
                         Node p = new Node();
                         p.setPanel(pan, menu);
                         line = line.substring(i+1, line.length()-1);
-                        //System.out.println(line);
                         
                         String[] crd = line.split(",");
                         p.setUniqueID(Instant.parse(crd[0]));
                         p.setName(crd[1]);
-                        // Look through current elements to see if any have the same ID
+
                         List<Component> frameElements = Arrays.asList(pan.getComponents());
                         if(!Instant.parse(crd[0]).equals(Instant.parse(crd[3])) 
                             && frameElements.size() < 4096) {
@@ -395,7 +382,6 @@ public class MenuBar implements ActionListener
                                     }
                                 }
                             }
-                            
                             if(none){
                                 p.setConnectedNodeID(Instant.parse(crd[3]));
                                 connCheck.add(p);
@@ -414,6 +400,7 @@ public class MenuBar implements ActionListener
                         int shiftY = p.getY() + (int)p.getSize().getHeight()/5;
                         p.setLocation(shiftX, shiftY);
                         p.updateZoom();
+                        p.updateConnectionPosition();
                         pan.add(p);
                     }
                     else if(line.substring(0,i).equals("Connector")){
@@ -428,6 +415,7 @@ public class MenuBar implements ActionListener
                             Node z = (Node)elem;
                             if(z.getUniqueID().equals(nod.getConnectedNodeID())){
                                 nod.setParentNode(z);
+                                nod.updateConnectionPosition();
                             }
                         }
                     }
@@ -436,21 +424,21 @@ public class MenuBar implements ActionListener
             }
             catch(Exception a){}
         }
-        if(e.getActionCommand() == "Find"){}
-        if(e.getActionCommand() == "Settings"){}
+        else if (e.getActionCommand() == "Find"){}
+        else if (e.getActionCommand() == "Settings"){}
         
-        if(e.getActionCommand() == "Fit Window"){}
-        if(e.getActionCommand() == "Zoom In"){}
-        if(e.getActionCommand() == "Zoom Out"){}
-        if(e.getActionCommand() == "Set Scaling.."){}
-        if(e.getActionCommand() == "View As.."){}
-        if(e.getActionCommand() == "Tutorial"){}
+        else if (e.getActionCommand() == "Fit Window"){}
+        else if (e.getActionCommand() == "Zoom In"){}
+        else if (e.getActionCommand() == "Zoom Out"){}
+        else if (e.getActionCommand() == "Set Scaling.."){}
+        else if (e.getActionCommand() == "View As.."){}
+        else if (e.getActionCommand() == "Tutorial"){}
         
-        if(e.getActionCommand() == "Verify"){}
-        if(e.getActionCommand() == "Display Sample Formula"){}
-        if(e.getActionCommand() == "Display Sample Tree"){}
+        else if (e.getActionCommand() == "Verify"){}
+        else if (e.getActionCommand() == "Display Sample Formula"){}
+        else if (e.getActionCommand() == "Display Sample Tree"){}
         
-        if(e.getActionCommand() == "Add Game Node"){
+        else if (e.getActionCommand() == "Add Game Node"){
             Node p = new Node();
             p.setPanel(pan, menu);
             p.setName("#"+nodeIndex.toString());
@@ -458,29 +446,38 @@ public class MenuBar implements ActionListener
             actions.addUndoAbleAction("MKS"+p.toString());
             pan.add(p);
             fram.repaint();
-        }
-        if(e.getActionCommand() == "Remove Game Node"){
+        } else if (e.getActionCommand() == "Remove Game Node"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
+            List<Component> cElements = new ArrayList<>();
             for(Component elem : frameElements){
                 if(elem.getForeground() == Color.red){
                     Node p = (Node) elem;
+                    cElements.add(p);
                     p.removeConnections();
                     pan.remove(elem);
                 }
             }
+            if(!cElements.isEmpty())
+                actions.addUndoAbleAction("DLM"+cElements);
             fram.repaint();
-        }
-        if(e.getActionCommand() == "Remove All Node"){
+        } else if (e.getActionCommand() == "Remove All Node"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
+            List<Component> cElements = new ArrayList<>();
             for(Component elem : frameElements){
-                pan.remove(elem);
+                if(elem.getClass().equals(Node.class)){
+                    cElements.add((Node)elem);
+                    ((Node)elem).removeConnections();
+                    pan.remove(elem);
+                }
             }
+            if(!cElements.isEmpty())
+                actions.addUndoAbleAction("DLM"+cElements);
             fram.repaint();
         }
         
-        if(e.getActionCommand() == "Components"){}
-        if(e.getActionCommand() == "Documentation"){}
-        if(e.getActionCommand() == "About"){}
+        else if (e.getActionCommand() == "Components"){}
+        else if (e.getActionCommand() == "Documentation"){}
+        else if (e.getActionCommand() == "About"){}
     }
 }
 
