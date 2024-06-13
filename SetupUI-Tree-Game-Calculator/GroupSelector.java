@@ -25,7 +25,7 @@ import java.util.Arrays;
  * of JPanel type objects in order to manipulate or hold them.
  *
  * @author Noah Winn
- * @version 5/31/2024
+ * @version 6/7/2024
  */
 
 
@@ -56,9 +56,7 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
         this.actions = fram.getActions();
         this.menu = menu;
         
-        //Source: https://stackoverflow.com/questions/874360
         addMouseListener(this);
-        
         addMouseMotionListener(this);
         
         this.setLayout(null);
@@ -69,8 +67,8 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
             this.add(rect);
         }
         this.setLocation(0,0);
+        this.setFocusable(true);
         menu.createPopupMenu(this);
-        //this.setRequestFocusEnabled(true);
     }
     public ActionManager getActions(){return actions;}
     public void mousePressed(MouseEvent e){

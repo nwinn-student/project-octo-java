@@ -1,14 +1,20 @@
 
 /**
- * Write a description of class Main here.
+ * The Main class's primary purpose is to create and initialize 
+ * the Frame object.
  *
  * @author Noah Winn
- * @version 5/23/2024
+ * @version 6/12/2024
  */
-public class Main
-{
-    public static void main(String[] args){
-        Frame fram = new Frame();
-        fram.initializeFrame();
+import javax.swing.SwingUtilities;
+public class Main {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable(){
+            @Override
+            public void run(){
+                Frame fram = new Frame();
+            }
+        });
+        
     }
 }

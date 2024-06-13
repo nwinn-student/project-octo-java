@@ -5,7 +5,7 @@
  * the screen.
  *
  * @author Noah Winn
- * @version 6/6/2024
+ * @version 6/7/2024
  */
 import javax.swing.JToolBar;
 import javax.swing.JButton;
@@ -97,12 +97,16 @@ public class ToolBar implements ActionListener{
             fram.repaint();
         } else if (e.getActionCommand() == "Delete Node"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
-            List<Component> cElements = new ArrayList<>();
+            List<String> cElements = new ArrayList<>();
             for(Component elem : frameElements){
                 if(elem.getForeground() == Color.red){
                     Node p = (Node) elem;
-                    cElements.add(p);
-                    p.removeConnections();
+                    cElements.add(p.toString());
+                }
+            }
+            for(Component elem : frameElements){
+                if(elem.getForeground() == Color.red){
+                    ((Node)elem).removeConnections();
                     pan.remove(elem);
                 }
             }
@@ -133,17 +137,21 @@ public class ToolBar implements ActionListener{
         }
         else if(e.getActionCommand() == "Cut"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
-            List<Component> cElements = new ArrayList<>();
+            List<String> cElements = new ArrayList<>();
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
                 if(frameElements.size() < 4096){
                     for(Component elem : frameElements){
                         if(elem.getForeground() == Color.red){
+                            cElements.add(((Node)elem).toString());
+                            out.println(elem);
+                        }
+                    }
+                    for(Component elem : frameElements){
+                        if(elem.getForeground() == Color.red){
                             Node p = (Node) elem;
                             p.setBorder(blackBorder);
                             p.setForeground(Color.black);
-                            cElements.add(p);
-                            out.println(elem);
                             p.removeConnections();
                             pan.remove(elem);
                         }
@@ -224,7 +232,6 @@ public class ToolBar implements ActionListener{
                             Node z = (Node)elem;
                             if(z.getUniqueID().equals(nod.getConnectedNodeID())){
                                 nod.setParentNode(z);
-                                nod.updateConnectionPosition();
                             }
                         }
                     }
@@ -232,7 +239,9 @@ public class ToolBar implements ActionListener{
                 fram.repaint();
                 // add Action.
             }
-            catch(Exception a){}
+            catch(Exception a){
+                System.out.println(a);
+            }
         }
     }
     

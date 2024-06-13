@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * hovers, scrolls, and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 6/6/2024
+ * @version 6/7/2024
  */
 
 
@@ -23,7 +23,7 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
 {
     // instance variables
     private Instant uniqueID = Instant.now();
-    private String name = "Enter name here..";
+    private String name = "";
     private String type = "Select type..";
     private Node parentNode = this; // Will only not be this when it has been changed
     private Instant connNodeID = parentNode.getUniqueID();
@@ -70,8 +70,6 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         this.setEnabled(true);
         this.setFocusable(true);
         this.setToolTipText(this.getName());
-        
-        
     }
     public Instant getUniqueID(){return uniqueID;}
     public void setUniqueID(Instant uniqueID){this.uniqueID = uniqueID;}
@@ -88,8 +86,10 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         }
         //System.out.println("Parent:"+parentNode);
         this.parentNode = parentNode;
+        this.setConnectedNodeID(parentNode.getUniqueID());
         parentNode.addChild(this);
         // Update stuff?
+        
         this.updateConnections();
         this.updateConnectionPosition();
     }
@@ -127,9 +127,10 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         bottom.updateConnectionPosition();
     }
     public void removeConnections(){
-        if(childrenNodes != null){
+        if(childrenNodes != null && !childrenNodes.isEmpty()){
+            this.parentNode.removeChild(this);
             for(Node elem : childrenNodes){
-                elem.removeConnections();
+                elem.setParentNode(elem);
             }
         }
         top.removeConnections();
@@ -151,12 +152,14 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         if(childrenNodes == null){
             childrenNodes = new ArrayList<>();
         }
-        System.out.println("Added"+child.toString());
+        //System.out.println("Added"+child.toString());
+        if(child.getUniqueID() == this.getUniqueID()){return;}
         childrenNodes.add(child);
     }
     public void removeChild(Node child){
-        if(childrenNodes == null) {return;}
+        if(childrenNodes == null || childrenNodes.isEmpty()) {return;}
         childrenNodes.remove(child);
+        child.setParentNode(child);
     }
     public List<Node> getChildren(){
         return childrenNodes;
@@ -165,8 +168,8 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         if(desc == null){
             desc = new ArrayList<>();
         }
-        if (node.getChildren() == null){return desc;} 
-            for(Node elem : node.getChildren()){
+        if (node.getChildren() == null || node.getChildren().isEmpty()){return desc;} 
+        for(Node elem : node.getChildren()){
             //String na = elem.getName();
             desc.add(elem);
             if(elem.getChildren() != null && !elem.getChildren().isEmpty()){
@@ -207,15 +210,13 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     }
     @Override
     public void mousePressed(MouseEvent e){
-        screenX = e.getXOnScreen();
-        screenY = e.getYOnScreen();
+        screenX = e.getXOnScreen(); screenY = e.getYOnScreen();
                 
-        myX = getX();
-        myY = getY();
+        myX = getX(); myY = getY();
     }
     @Override
     public void mouseDragged(MouseEvent e){
-        if(e.getButton() == 0){
+        if(e.getModifiersEx() == 1024){
             int deltaX = e.getXOnScreen() - screenX;
             int deltaY = e.getYOnScreen() - screenY;
             setLocation(myX + deltaX, myY + deltaY);
@@ -316,8 +317,7 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     @Override
     public void mouseMoved(MouseEvent e){}
     public void shiftLocation(int deltaX, int deltaY){
-        
-        this.setLocation(this.myX + deltaX, this.myY + deltaY);
+        setLocation(myX + deltaX, myY + deltaY);
         top.updatePosition();
         bottom.updatePosition();
         if(childrenNodes != null){
@@ -332,13 +332,13 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         myY = getY();
     }
     private Dimension getZoomedSize(int x,int y) {
-        this.setVisible(false);
-        this.setVisible(true);
-        this.setLocation(x, y);
+        setVisible(false);
+        setVisible(true);
+        setLocation(x, y);
         return new Dimension((int)(currentZoom * 50), (int)(currentZoom * 50));
     }
     public void updateZoom(){
-        currentZoom = this.getSize().getHeight()/50;
+        currentZoom = getSize().getHeight()/50;
     }
     @Override
     public String toString(){

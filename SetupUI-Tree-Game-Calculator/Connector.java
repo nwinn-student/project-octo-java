@@ -18,7 +18,7 @@ import java.util.Arrays;
  * and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 6/6/2024
+ * @version 6/7/2024
  */
 
 
@@ -75,7 +75,10 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
     }
     public void setConnParentNode(Node connParentNode){
         this.connParentNode = connParentNode;
-        updateConnectionPosition();
+        if(connParentNode != parentNode){
+            updateConnectionPosition();
+        }
+        
     }
     public void removeConnected(){
         isConnected = false;
@@ -101,9 +104,12 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         select.repaint();
     }
     public void updateConnectionPosition(){
-        if(connParentNode != null){
+        if(connParentNode != null && connParentNode != parentNode){
             point = connParentNode.getClosestConnector(this).getLocation();
             connectToPoint();
+        } else {
+            panVert.setVisible(false);
+            panHori.setVisible(false);
         }
     }
     public void removeConnections(){
@@ -158,10 +164,9 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         }
         panVert.setVisible(true);
         panHori.setVisible(true);
-        point.setLocation(myX+deltaX, myY+deltaY);
+        //point.setLocation(myX+deltaX, myY+deltaY);
         //isConnected = false;
         select.repaint();
-        
         
     } 
     @Override
@@ -191,8 +196,8 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
                             if(this.parentNode.getParentNode() == connParentNode){
                                 updateConnectionPosition();
                                 isConnected = true;
-                                panVert.setVisible(true);
-                                panHori.setVisible(true);
+                                //panVert.setVisible(true);
+                                //panHori.setVisible(true);
                             }
                             break;
                         }
@@ -216,7 +221,7 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         }
         return false;
     }
-    private void connectToPoint(){
+    public void connectToPoint(){
         if(pos.equals("Top")){
             int h = (int)this.getSize().getHeight();
             int w = (int)this.getSize().getWidth();
@@ -246,8 +251,13 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
                 panHori.setBounds(myX, myY+pointY, Math.abs(pointX), h);
             else if(pointX < 0 && pointY > 0)
                 panHori.setBounds((int)point.getX(), myY+pointY, Math.abs(pointX), h);
-            else
+            else{
                 panHori.setBounds(myX, 0, 0, 0);
+            }
+        }
+        if(!point.equals(new Point(0,0)) && connParentNode != parentNode){
+            panVert.setVisible(true);
+            panHori.setVisible(true);
         }
     }
 }

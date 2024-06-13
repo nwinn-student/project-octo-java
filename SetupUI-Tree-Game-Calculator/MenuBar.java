@@ -32,7 +32,7 @@ import java.time.Instant;
  * the screen.
  *
  * @author Noah Winn
- * @version 6/6/2024
+ * @version 6/7/2024
  */
 public class MenuBar implements ActionListener
 {
@@ -281,10 +281,10 @@ public class MenuBar implements ActionListener
         
         else if (e.getActionCommand() == "Undo"){
             try {actions.undo();}
-            catch(Exception a) {System.out.println(a);}
+            catch(Exception a) {System.out.println("Error: "+a);}
         } else if (e.getActionCommand() == "Redo"){
             try {actions.redo();}
-            catch(Exception a) {System.out.println(a);}
+            catch(Exception a) {System.out.println("Error: "+a);}
         } else if (e.getActionCommand() == "Duplicate"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
             if(frameElements.size() < 4096){
@@ -325,17 +325,21 @@ public class MenuBar implements ActionListener
             catch(Exception a){}
         } else if (e.getActionCommand() == "Cut"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
-            List<Component> cElements = new ArrayList<>();
+            List<String> cElements = new ArrayList<>();
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
                 if(frameElements.size() < 4096){
                     for(Component elem : frameElements){
                         if(elem.getForeground() == Color.red){
+                            cElements.add(((Node)elem).toString());
+                            out.println(elem);
+                        }
+                    }
+                    for(Component elem : frameElements){
+                        if(elem.getForeground() == Color.red){
                             Node p = (Node) elem;
                             p.setBorder(blackBorder);
                             p.setForeground(Color.black);
-                            cElements.add(p);
-                            out.println(elem);
                             p.removeConnections();
                             pan.remove(elem);
                         }
@@ -415,14 +419,15 @@ public class MenuBar implements ActionListener
                             Node z = (Node)elem;
                             if(z.getUniqueID().equals(nod.getConnectedNodeID())){
                                 nod.setParentNode(z);
-                                nod.updateConnectionPosition();
                             }
                         }
                     }
                 }
                 fram.repaint();
             }
-            catch(Exception a){}
+            catch(Exception a){
+                System.out.println(a);
+            }
         }
         else if (e.getActionCommand() == "Find"){}
         else if (e.getActionCommand() == "Settings"){}
@@ -448,12 +453,16 @@ public class MenuBar implements ActionListener
             fram.repaint();
         } else if (e.getActionCommand() == "Remove Game Node"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
-            List<Component> cElements = new ArrayList<>();
+            List<String> cElements = new ArrayList<>();
             for(Component elem : frameElements){
                 if(elem.getForeground() == Color.red){
                     Node p = (Node) elem;
-                    cElements.add(p);
-                    p.removeConnections();
+                    cElements.add(p.toString());
+                }
+            }
+            for(Component elem : frameElements){
+                if(elem.getForeground() == Color.red){
+                    ((Node)elem).removeConnections();
                     pan.remove(elem);
                 }
             }
@@ -462,10 +471,15 @@ public class MenuBar implements ActionListener
             fram.repaint();
         } else if (e.getActionCommand() == "Remove All Node"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
-            List<Component> cElements = new ArrayList<>();
+            List<String> cElements = new ArrayList<>();
             for(Component elem : frameElements){
-                if(elem.getClass().equals(Node.class)){
-                    cElements.add((Node)elem);
+                if(elem.getForeground() == Color.red){
+                    Node p = (Node) elem;
+                    cElements.add(p.toString());
+                }
+            }
+            for(Component elem : frameElements){
+                if(elem.getForeground() == Color.red){
                     ((Node)elem).removeConnections();
                     pan.remove(elem);
                 }

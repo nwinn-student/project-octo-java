@@ -13,7 +13,7 @@ import java.awt.Component;
  * edits to be used.
  *
  * @author Noah Winn
- * @version 6/6/2024
+ * @version 6/7/2024
  */
 public class ActionManager {
     private final short MAX_SIZE = 512;
@@ -50,7 +50,6 @@ public class ActionManager {
          * Nodes have their own uniqueIDs, so we look for that first.
          */
         //System.out.println(action);
-        // Look at first 3
         if(isUndo){
             if(action.substring(0,3).equals("MKS")){
                 // Removing
@@ -94,6 +93,8 @@ public class ActionManager {
                         String[] crd = line.split(",");
                         p.setUniqueID(Instant.parse(crd[0]));
                         p.setName(crd[1]);
+                        
+                        System.out.println(crd[0] + " : " + crd[3]);
                         List<Component> frameElements = Arrays.asList(undoAblePanel.getComponents());
                         if(!Instant.parse(crd[0]).equals(Instant.parse(crd[3])) 
                             && frameElements.size() < 4096) {
