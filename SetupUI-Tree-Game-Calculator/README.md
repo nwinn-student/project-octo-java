@@ -11,3 +11,14 @@ Currently prioritized.
 | Source | Inspired | Explanation |
 | :--- | :--- | :--- |
 | [`Digital`](https://github.com/hneemann/Digital) | [`Setup-Tree UI`](https://github.com/nwinn-student/project-octo-java/tree/main/SetupUI-Tree-Game-Calculator) | Digital's UI design and approach to creating, editting, and deleting the various component elements inspired the approach that was taken within Setup-Tree UI. |
+
+## Accessibility Notice
+
+For those visually impaired, I am using [NVDA](https://www.nvaccess.org/download/) to test and ensure that the application, once it becomes that, will be usable.
+
+For Windows visually impaired users without NVDA set up for Java applications:
+
+1. Navigate to Control Panel.
+2. Navigate to Ease of Access: Optimize Visual Display.
+3. Traverse to until you hear Enable Java Access Bridge
+4. Apply these changes.  Congratulations, you can now ear much more information regarding various applications than you could previously.
