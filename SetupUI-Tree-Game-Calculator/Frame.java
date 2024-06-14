@@ -1,3 +1,15 @@
+import java.awt.Color;
+import javax.swing.JFrame;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowEvent;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
+import java.awt.AWTEvent;
+import java.awt.Rectangle;
+import java.awt.Point;
+import java.awt.event.ComponentListener;
+import java.awt.event.ComponentEvent;
 
 /**
  * The Frame class's primary purpose is to create a JFrame, a 
@@ -17,7 +29,8 @@
  * technique is used by LibreWolf and some other applications, although
  * the value itself varies.  The Frame is resizable, with a Cyan 
  * background, and will spawn in the center of the screen.  The Frame will automatically
- * resize itself and repaint itself every 2 seconds should the frame be active (to be done).
+ * resize and reposition itself when the screenSize has changed, example, from 1920x1080 
+ * to 800x600.
  * 
  * When the Frame is clicked out of, the PopupMenu will be hidden, so
  * as to not hinder other applications, and when the Frame is iconified
@@ -30,22 +43,15 @@
  * in their respective files.
  *
  * @author Noah Winn
- * @version 6/12/2024
+ * @version 6/14/2024
  */
 
-import java.awt.Color;
-import javax.swing.JFrame;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowEvent;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import javax.swing.SwingUtilities;
-import java.util.concurrent.TimeUnit;
-public class Frame extends JFrame implements WindowListener{
+public class Frame extends JFrame implements WindowListener, ComponentListener{
     // instance variables
     private Frame fram = this;
-    private boolean isOpen = false;
-    private boolean isActive = false;
+    private Dimension screenSize = null;
+    private Dimension frameSize = null;
+    private Point frameLocation = null;
     private EditPopupMenu popupMenu = new EditPopupMenu();
     private ActionManager actions = new ActionManager();
     /**
@@ -57,19 +63,21 @@ public class Frame extends JFrame implements WindowListener{
         initializeFrame();
     }
     /**
-     * An example of a method - replace this comment with your own
+     * Called by the constructors to initialize the Frame properly with the necessary
+     * features.
      */
-    public void initializeFrame(){
+    protected void initializeFrame(){
         //this.setTitle(); // For later when user can open files and probably in MenuBar instead?
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int inset = (int)(screenSize.width/12.5);
         this.setSize(screenSize.width - inset,screenSize.height - inset);
-        inset = 0; screenSize = null;
+        frameSize = this.getSize();
+        inset = 0;
         this.setResizable(true);
         this.getContentPane().setBackground(new Color(200,255,255));
         this.addWindowListener(this);
-        
+        this.addComponentListener(this);
         GroupSelector pan3 = new GroupSelector(this, popupMenu);
         
         //Creates menu components
@@ -84,62 +92,80 @@ public class Frame extends JFrame implements WindowListener{
         this.add(pan3);        
         this.setVisible(true);
         this.setLocationRelativeTo(null);
-        isActive = true;
-        isOpen = true;
-        begin();
+        frameLocation = fram.getLocation();
+        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener(){
+            @Override
+            public void eventDispatched(AWTEvent event){
+                if(screenSize.width != Toolkit.getDefaultToolkit().getScreenSize().width || screenSize.height != Toolkit.getDefaultToolkit().getScreenSize().height){
+                    Dimension newSize = Toolkit.getDefaultToolkit().getScreenSize();
+                    fram.setBounds(
+                        newSize.width*frameLocation.x/screenSize.width,
+                        newSize.height*frameLocation.y/screenSize.height,
+                        newSize.width*frameSize.width/screenSize.width,
+                        newSize.height*frameSize.height/screenSize.height
+                    );
+                    fram.repaint(); //Change this section to repaint() only certain segments
+                    frameSize = fram.getSize();
+                    frameLocation = fram.getLocation();
+                    screenSize = newSize;
+                    return;
+                }
+            }
+        }, AWTEvent.PAINT_EVENT_MASK);
+        
     }
+    /**
+     * Retrieves the ActionManager object, which is used for undoing and redoing actions.
+     * @return the actionManager for this frame
+     */
     public ActionManager getActions(){return actions;}
+    /**
+     * Hides the popupMenu when it is visible, activates whenever the window is clicked
+     * out of.
+     */
     @Override
     public void windowDeactivated(WindowEvent w){
-        isActive = false;
         popupMenu.setVisible(false);
     }
     @Override
-    public void windowActivated(WindowEvent w){
-        isActive = true;
-        end();
-        begin();
-    }
+    public void windowActivated(WindowEvent w){}
     @Override
     public void windowDeiconified(WindowEvent w){}
+    /**
+     * Hides the popupMenu when it is visible, activates whenever the window is 
+     * turned into an icon.
+     */
     @Override
     public void windowIconified(WindowEvent w){
-        isActive = false;
         popupMenu.setVisible(false);
     }
     @Override
     public void windowClosed(WindowEvent w){}
+    /**
+     * Will save the Frame location and size, not done yet, activates whenever the 
+     * window is closing, when you have pressed the X button, but not CTRL-Q, will
+     * have to do that separately or adjust how CTRL-Q operates.
+     */
     @Override
     public void windowClosing(WindowEvent w){
-        isOpen = false;
-        //System.out.println("Frame is closing, proceeding to operate HistoricReader in order to save settings");
+        System.out.println("Frame is closing, proceeding to operate HistoricReader in order to save settings");
     }
     @Override
-    public void windowOpened(WindowEvent w){isOpen = true;}
-    Thread refresher;
-    public void begin(){
-        refresher = new Thread()
-        {
-            @Override
-            public void run(){
-                while(isOpen && isActive){
-                    try{
-                        this.sleep(2000); // 2 seconds
-                    }
-                    catch(InterruptedException ie){
-                    }
-                    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                    int inset = (int)(screenSize.width/12.5);
-                    System.out.println(fram.getX()+" "+fram.getY());
-                    // Flawed in that is doesn't stay still when screensize is the same and that if you resize it, everything messes up.
-                    fram.setBounds((int)(screenSize.width*fram.getX()/(fram.getWidth()*12.5/11.5)),(int)(screenSize.height*fram.getY()/(fram.getHeight()*12.5/11.5)),screenSize.width - inset,screenSize.height - inset);
-                    fram.repaint();
-                }
-            }
-        };
-        refresher.start();
+    public void windowOpened(WindowEvent w){}
+    @Override
+    public void componentResized(ComponentEvent c){
+        if(Toolkit.getDefaultToolkit().getScreenSize().equals(screenSize)){
+            frameSize = fram.getSize();
+        }
     }
-    public void end(){
-        refresher.stop();
+    @Override
+    public void componentMoved(ComponentEvent c){
+        if(Toolkit.getDefaultToolkit().getScreenSize().equals(screenSize)){
+            frameLocation = fram.getLocation();
+        }
     }
+    @Override
+    public void componentHidden(ComponentEvent c){}
+    @Override
+    public void componentShown(ComponentEvent c){}
 }
