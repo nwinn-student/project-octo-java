@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * hovers, scrolls, and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 6/7/2024
+ * @version 6/25/2024
  */
 
 
@@ -208,12 +208,18 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         }
         select.repaint();
     }
+    /**
+     * Initializes the position of the node.
+     */
     @Override
     public void mousePressed(MouseEvent e){
         screenX = e.getXOnScreen(); screenY = e.getYOnScreen();
-                
         myX = getX(); myY = getY();
     }
+    /**
+     * Adjusts the position of the node and other selected nodes to move as the
+     * mouse moves.
+     */
     @Override
     public void mouseDragged(MouseEvent e){
         if(e.getModifiersEx() == 1024){
@@ -258,6 +264,10 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     public void mouseExited(MouseEvent e){}
     @Override
     public void mouseEntered(MouseEvent e){}
+    /**
+     * Updates the location of the selected nodes and puts in an undoable action.
+     * The undoable action is not yet complete for this. 
+     */
     @Override
     public void mouseReleased(MouseEvent e){
         myX = getX();
@@ -277,6 +287,9 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
             actions.addUndoAbleAction("MOV"+cElements); // ?
         } else {actions.addUndoAbleAction("MOV"+this);}
     }
+    /**
+     * Swaps whether the node is selected or not OR pops up the popup menu.
+     */
     @Override
     public void mouseClicked(MouseEvent e){
         if (e.getButton() == MouseEvent.BUTTON1){
@@ -316,6 +329,11 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     }
     @Override
     public void mouseMoved(MouseEvent e){}
+    /**
+     * Repositions the node and updates the connected Connectors.
+     * @param deltaX, how much the node was shifted in the X direction
+     * @param deltaY, how much the node was shifted in the Y direction
+     */
     public void shiftLocation(int deltaX, int deltaY){
         setLocation(myX + deltaX, myY + deltaY);
         top.updatePosition();
@@ -331,12 +349,19 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
         myX = getX();
         myY = getY();
     }
+    /**
+     * Calculates how much big the node should be and where.
+     * @returns size, the new size the node should become
+     */
     private Dimension getZoomedSize(int x,int y) {
         setVisible(false);
         setVisible(true);
         setLocation(x, y);
         return new Dimension((int)(currentZoom * 50), (int)(currentZoom * 50));
     }
+    /**
+     * Adjusts the currentZoom value based on the size of the node.
+     */
     public void updateZoom(){
         currentZoom = getSize().getHeight()/50;
     }

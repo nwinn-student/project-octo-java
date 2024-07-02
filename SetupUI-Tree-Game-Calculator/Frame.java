@@ -10,6 +10,7 @@ import java.awt.Rectangle;
 import java.awt.Point;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+
 /**
  * The Frame class's primary purpose is to create a JFrame, a 
  * window if you will, that can display certain information.  The 
@@ -42,7 +43,7 @@ import java.awt.event.ComponentEvent;
  * in their respective files.
  *
  * @author Noah Winn
- * @version 6/16/2024
+ * @version 6/30/2024
  */
 
 public class Frame extends JFrame implements WindowListener, ComponentListener{
@@ -97,9 +98,15 @@ public class Frame extends JFrame implements WindowListener, ComponentListener{
         Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener(){
             @Override
             public void eventDispatched(AWTEvent event){
-                
                 if(screenSize.width != Toolkit.getDefaultToolkit().getScreenSize().width || screenSize.height != Toolkit.getDefaultToolkit().getScreenSize().height){
                     Dimension newSize = Toolkit.getDefaultToolkit().getScreenSize();
+                    if(fram.isUndecorated()){
+                        frameSize = new Dimension(newSize.width*frameSize.width/screenSize.width,newSize.height*frameSize.height/screenSize.height);
+                        frameLocation = new Point(newSize.width*frameLocation.x/screenSize.width,newSize.height*frameLocation.y/screenSize.height);
+                        screenSize = newSize;
+                        fram.repaint(); //Change this section to repaint() only certain segments
+                        return;
+                    }
                     if(fram.getExtendedState() == JFrame.MAXIMIZED_BOTH){
                         frameSize = new Dimension(newSize.width*frameSize.width/screenSize.width,newSize.height*frameSize.height/screenSize.height);
                         frameLocation = new Point(newSize.width*frameLocation.x/screenSize.width,newSize.height*frameLocation.y/screenSize.height);
@@ -160,13 +167,16 @@ public class Frame extends JFrame implements WindowListener, ComponentListener{
     }
     @Override
     public void windowOpened(WindowEvent w){}
-    @Override
     /**
      * Fires before eventDispatched sometimes, which can cause size conflicts when using Scale, at least in Windows.
      * In order to stop this from occurring, the contents were moved to eventDispatched.  
      * Also, coordinates always are at 0,0 when Windows scales, so that made it easier to fix.
      */
+    @Override
     public void componentResized(ComponentEvent c){
+        if(fram.isUndecorated()){
+            return;
+        }
         if(fram.getExtendedState() == JFrame.MAXIMIZED_BOTH){
             return;
         }
@@ -177,12 +187,15 @@ public class Frame extends JFrame implements WindowListener, ComponentListener{
             frameSize = fram.getSize();
         }
     }
-    @Override
     /**
      * Relocates the Frame object whenever it moves, should be fine, unlike componentResized, hopefully.
      * Ensured that a component cannot be at 0,0.
      */
+    @Override
     public void componentMoved(ComponentEvent c){
+        if(fram.isUndecorated()){
+            return;
+        }
         if(fram.getExtendedState() == JFrame.MAXIMIZED_BOTH){
             return;
         }
@@ -198,4 +211,11 @@ public class Frame extends JFrame implements WindowListener, ComponentListener{
     public void componentHidden(ComponentEvent c){}
     @Override
     public void componentShown(ComponentEvent c){}
+    /**
+     * Updates the screensize, only used by MenuBar when fullscreening.
+     */
+    public void updateScreensize(){
+        fram.setSize(frameSize);
+        fram.setLocation(frameLocation);
+    }
 }

@@ -12,7 +12,7 @@ import java.awt.event.MouseListener;
  * Write a description of class EditView here.
  *
  * @author Noah Winn
- * @version 6/6/2024
+ * @version 6/25/2024
  */
 public class EditView extends JInternalFrame implements ActionListener, MouseListener{
     private GroupSelector pan = null;
@@ -138,12 +138,18 @@ public class EditView extends JInternalFrame implements ActionListener, MouseLis
             //System.out.println(node);
         }
     }
+    /**
+     * Sets the elements within the EditView to focusable
+     */
     @Override
     public void mouseEntered(MouseEvent e){
         header.setFocusable(true);
         type.setFocusable(true);
         connectedTo.setFocusable(true);
     }
+    /**
+     * Sets the elements within the EditView to unfocusable, when the cursor leaves
+     */
     @Override
     public void mouseExited(MouseEvent e){
         if(!isWithin(e)){
@@ -158,6 +164,9 @@ public class EditView extends JInternalFrame implements ActionListener, MouseLis
     public void mousePressed(MouseEvent e){}
     @Override
     public void mouseReleased(MouseEvent e){}
+    /**
+     * Whether the mouse is within the EditView object or not
+     */
     public boolean isWithin(MouseEvent e){
         if(e.getX() < 0 || e.getX() >= this.getWidth()){
             return false;

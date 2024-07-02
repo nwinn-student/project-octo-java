@@ -13,7 +13,7 @@ import java.awt.Component;
  * edits to be used.
  *
  * @author Noah Winn
- * @version 6/7/2024
+ * @version 6/25/2024
  */
 public class ActionManager {
     private final short MAX_SIZE = 512;
@@ -40,6 +40,39 @@ public class ActionManager {
             return false;
         }
         return true;
+    }
+    private void updateLists(){
+        if(undoAbleList.size() > MAX_SIZE){
+            // no need for Deque due to the small size of the stack
+            undoAbleList.removeElementAt(MAX_SIZE);
+        }
+    }
+    /**
+     * Undoes the previous action
+     */
+    public void undo(){
+        if(canUndo()){
+            redoAbleList.push(undoAbleList.pop());
+            doAction(redoAbleList.peek(), true);
+        }
+        //System.out.println(undoAbleList+" "+redoAbleList);
+    }
+    /**
+     * Redoes the undone action
+     */
+    public void redo(){
+        if(canRedo()){
+            undoAbleList.push(redoAbleList.pop());
+            doAction(undoAbleList.peek(), false);
+        }
+        //System.out.println(undoAbleList+" "+redoAbleList);
+    }
+    /**
+     * Adds an action that can be undone/redone.
+     */
+    public void addUndoAbleAction(String action){
+        undoAbleList.push(action);
+        updateLists();
     }
     private void doAction(String action, boolean isUndo){
         /*
@@ -220,29 +253,5 @@ public class ActionManager {
             }
             
         }
-    }
-    private void updateLists(){
-        if(undoAbleList.size() > MAX_SIZE){
-            // no need for Deque due to the small size of the stack
-            undoAbleList.removeElementAt(MAX_SIZE);
-        }
-    }
-    public void undo(){
-        if(canUndo()){
-            redoAbleList.push(undoAbleList.pop());
-            doAction(redoAbleList.peek(), true);
-        }
-        //System.out.println(undoAbleList+" "+redoAbleList);
-    }
-    public void redo(){
-        if(canRedo()){
-            undoAbleList.push(redoAbleList.pop());
-            doAction(undoAbleList.peek(), false);
-        }
-        //System.out.println(undoAbleList+" "+redoAbleList);
-    }
-    public void addUndoAbleAction(String action){
-        undoAbleList.push(action);
-        updateLists();
     }
 }

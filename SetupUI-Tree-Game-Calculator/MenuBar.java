@@ -32,7 +32,7 @@ import java.time.Instant;
  * the screen.
  *
  * @author Noah Winn
- * @version 6/7/2024
+ * @version 6/30/2024
  */
 public class MenuBar implements ActionListener
 {
@@ -45,12 +45,11 @@ public class MenuBar implements ActionListener
     private JMenu fileMenu, editMenu, viewMenu, testMenu, nodeMenu, helpMenu = null;
     
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
-
     /**
      * Constructor for objects of class MenuBar
      */
     public MenuBar(){}
-
+    
     public void createMenuBar(Frame fram, GroupSelector pan, EditPopupMenu menu){
         this.fram = fram;
         this.actions = fram.getActions();
@@ -84,7 +83,7 @@ public class MenuBar implements ActionListener
         addMenuItem("Find", editMenu, KeyEvent.VK_F, "Use Control-F to use Find, ..."); // CTRL F
         addMenuItem("Settings", editMenu, KeyEvent.VK_COMMA, "Use Control-Comma to use Settings, ..."); // CTRL ,
         
-        addMenuItem("Fit Window", viewMenu, 0, "...");
+        addMenuItem("Fullscreen", viewMenu, KeyEvent.VK_F11, "Use F11 to fullscreen."); // f11, later
         addMenuItem("Zoom In", viewMenu, KeyEvent.VK_PLUS, "Use Control-Plus to use Zoom In, ...");
         addMenuItem("Zoom Out", viewMenu, KeyEvent.VK_MINUS, "Use Control-Minus to use Zoom Out, ...");
         addMenuItem("Set Scaling", viewMenu, 0, "...");
@@ -107,7 +106,12 @@ public class MenuBar implements ActionListener
     }
     
     /**
-     * Constructor for objects of class Frame
+     * Used to make JMenus easier to create.
+     * 
+     * @param title, the name of the JMenu object to be created
+     * @param parent, the JMenuBar to add the JMenu object to
+     * @param key, the keyboard key necessary to activate the button w/o clicking
+     * @param description, for screen readers to provide extra information
      */
     private JMenu addMenu(String title, JMenuBar parent, int key, String description){
         JMenu menu = new JMenu(title);
@@ -121,15 +125,21 @@ public class MenuBar implements ActionListener
         return menu;
     }
     /**
-     * Constructor for objects of class Frame
+     * Used to make JMenuItems easier to create.
+     * 
+     * @param title, the name of the JMenuItem object to be created
+     * @param parent, the JMenu to add the JMenuItem object to
+     * @param key, the keyboard key necessary to activate the button w/o clicking
+     * @param description, for screen readers to provide extra information
      */
     private void addMenuItem(String title, JMenu parent, int key, String description){
         JMenuItem menuItem = new JMenuItem(title);
         if(key != 0){
             if(title.equals("Remove Game Node")){
                menuItem.setAccelerator(KeyStroke.getKeyStroke(key, 0));
-            }
-            else{
+            } else if(title.equals("Fullscreen")){
+                menuItem.setAccelerator(KeyStroke.getKeyStroke(key, 0));
+            } else{
                  //Key is not undefined, will always require CTRL
                 menuItem.setAccelerator(KeyStroke.getKeyStroke(key, Event.CTRL_MASK));
             }
@@ -158,14 +168,12 @@ public class MenuBar implements ActionListener
             
             //Create a new file, if the file exists then ask if the user wants
             //to delete the existing file using another frame
-            
         }
         if(e.getActionCommand() == "Open"){
             JFileChooser fileChooser = new JFileChooser();
             int response = fileChooser.showOpenDialog(null);
             if(response == JFileChooser.APPROVE_OPTION){
                 File file = fileChooser.getSelectedFile();
-                
                 //Open the file
                 try{
                     //Must be .txt extension.
@@ -177,16 +185,12 @@ public class MenuBar implements ActionListener
                         String[] field = line.split("    "); //or \t
                         
                         //Sets up the UI
-                        
                     }
-                }
-                catch(FileNotFoundException err){
+                } catch(FileNotFoundException err){
                     System.out.println(err);
                 }
-                
                 System.out.println(file);
             }
-            
         }
         if(e.getActionCommand() == "Save"){
             JFileChooser fileChooser = new JFileChooser();
@@ -207,10 +211,8 @@ public class MenuBar implements ActionListener
                     while(scan.hasNextLine()){
                         String line = scan.nextLine();
                         String[] field = line.split("    "); //or \t
-                        
                     }
-                }
-                catch(FileNotFoundException err){
+                } catch(FileNotFoundException err){
                     System.out.println("The system cannot find the file specified.\nAttempting to create a file...");
                     
                     // Should the file not be found, we must create it
@@ -218,16 +220,11 @@ public class MenuBar implements ActionListener
                         PrintWriter out = new PrintWriter(file.toString() + ".txt");
                         
                         //Add the contents***
-                        
-                        
                         out.close();
-                    }
-                    catch(FileNotFoundException newerr){
+                    } catch(FileNotFoundException newerr){
                         System.out.println("Failed to create a file.\n"+newerr);
                     }
-                    
                 }
-                
                 System.out.println(file);
             }
         }
@@ -252,8 +249,7 @@ public class MenuBar implements ActionListener
                         String[] field = line.split("    "); //or \t
                         
                     }
-                }
-                catch(FileNotFoundException err){
+                } catch(FileNotFoundException err){
                     System.out.println("The system cannot find the file specified.\nAttempting to create a file...");
                     
                     // Should the file not be found, we must create it
@@ -261,14 +257,10 @@ public class MenuBar implements ActionListener
                         PrintWriter out = new PrintWriter(file.toString() + ".txt");
                         
                         //Add the contents***
-                        
-                        
                         out.close();
-                    }
-                    catch(FileNotFoundException newerr){
+                    } catch(FileNotFoundException newerr){
                         System.out.println("Failed to create a file.\n"+newerr);
                     }
-                    
                 }
                 System.out.println(file);
             }
@@ -304,7 +296,7 @@ public class MenuBar implements ActionListener
                     }
                 }
             }
-            fram.repaint();
+            pan.repaint();
         } else if (e.getActionCommand() == "Copy"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
             try{
@@ -319,7 +311,7 @@ public class MenuBar implements ActionListener
                         }
                     }
                 }
-                fram.repaint();
+                pan.repaint();
                 out.close();
             }
             catch(Exception a){}
@@ -348,7 +340,7 @@ public class MenuBar implements ActionListener
                 out.close();
                 if(!cElements.isEmpty())
                     actions.addUndoAbleAction("DLM"+cElements);
-                fram.repaint();
+                pan.repaint();
             }
             catch(Exception a){}
         } else if (e.getActionCommand() == "Paste"){
@@ -391,13 +383,11 @@ public class MenuBar implements ActionListener
                                 connCheck.add(p);
                             }
                         }
-                        
                         p.setBounds(
                             Integer.parseInt(crd[4]),Integer.parseInt(crd[5]),
                             Integer.parseInt(crd[6]),Integer.parseInt(crd[7])
                             );
                         //Formulas...
-                        
                         
                         //Shift
                         int shiftX = p.getX() + (int)p.getSize().getWidth()/5;
@@ -406,9 +396,6 @@ public class MenuBar implements ActionListener
                         p.updateZoom();
                         p.updateConnectionPosition();
                         pan.add(p);
-                    }
-                    else if(line.substring(0,i).equals("Connector")){
-                        
                     }
                 }
                 scan.close();
@@ -423,16 +410,30 @@ public class MenuBar implements ActionListener
                         }
                     }
                 }
-                fram.repaint();
-            }
-            catch(Exception a){
+                pan.repaint();
+            } catch(Exception a){
                 System.out.println(a);
             }
         }
         else if (e.getActionCommand() == "Find"){}
         else if (e.getActionCommand() == "Settings"){}
         
-        else if (e.getActionCommand() == "Fit Window"){}
+        else if (e.getActionCommand() == "Fullscreen"){
+            if(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
+                // There is currently an issue where the user can spam this and the screen flashes... not fun
+                fram.dispose();
+                fram.setUndecorated(!fram.isUndecorated());
+                if(fram.isUndecorated()){
+                    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(fram);
+                } else{
+                    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);
+                    fram.updateScreensize();
+                }
+                fram.setVisible(true);
+                fram.repaint();
+                // Wait until the screen has actually properly loaded
+            }
+        }
         else if (e.getActionCommand() == "Zoom In"){}
         else if (e.getActionCommand() == "Zoom Out"){}
         else if (e.getActionCommand() == "Set Scaling.."){}
@@ -450,7 +451,7 @@ public class MenuBar implements ActionListener
             nodeIndex++;
             actions.addUndoAbleAction("MKS"+p.toString());
             pan.add(p);
-            fram.repaint();
+            pan.repaint();
         } else if (e.getActionCommand() == "Remove Game Node"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
             List<String> cElements = new ArrayList<>();
@@ -468,7 +469,7 @@ public class MenuBar implements ActionListener
             }
             if(!cElements.isEmpty())
                 actions.addUndoAbleAction("DLM"+cElements);
-            fram.repaint();
+            pan.repaint();
         } else if (e.getActionCommand() == "Remove All Node"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
             List<String> cElements = new ArrayList<>();
@@ -486,7 +487,7 @@ public class MenuBar implements ActionListener
             }
             if(!cElements.isEmpty())
                 actions.addUndoAbleAction("DLM"+cElements);
-            fram.repaint();
+            pan.repaint();
         }
         
         else if (e.getActionCommand() == "Components"){}

@@ -5,7 +5,7 @@
  * the screen.
  *
  * @author Noah Winn
- * @version 6/7/2024
+ * @version 6/25/2024
  */
 import javax.swing.JToolBar;
 import javax.swing.JButton;
@@ -57,7 +57,14 @@ public class ToolBar implements ActionListener{
         toolBar.getAccessibleContext().setAccessibleName("Tool Bar");
         fram.add(toolBar, BorderLayout.PAGE_START);
     }
-    
+    /**
+     * Used to make JButtons easier to create.
+     * 
+     * @param title, the name of the JButton object to be created
+     * @param parent, the JToolBar to add the JButton object to
+     * @param key, the keyboard key necessary to activate the button w/o clicking
+     * @param description, for screen readers to provide extra information
+     */
     public void addButton(String name, JToolBar parent, String description){
         JButton button = new JButton(name);
         button.addActionListener(this);
@@ -77,7 +84,7 @@ public class ToolBar implements ActionListener{
             nodeIndex++;
             actions.addUndoAbleAction("MKS"+p.toString());
             pan.add(p);
-            fram.repaint();
+            pan.repaint();
         } else if (e.getActionCommand() == "Connect Nodes"){
             //CONNECTS selected nodes, remove?
             // Was originally thinking of having the user select a node, 
@@ -94,7 +101,7 @@ public class ToolBar implements ActionListener{
                 //actions.addUndoAbleAction("CNM"+cElements.toString());
             }
             
-            fram.repaint();
+            pan.repaint();
         } else if (e.getActionCommand() == "Delete Node"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
             List<String> cElements = new ArrayList<>();
@@ -112,7 +119,7 @@ public class ToolBar implements ActionListener{
             }
             if(!cElements.isEmpty())
                 actions.addUndoAbleAction("DLM"+cElements);
-            fram.repaint();
+            pan.repaint();
         }
         else if(e.getActionCommand() == "Copy"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
@@ -130,7 +137,7 @@ public class ToolBar implements ActionListener{
                         }
                     }
                 }
-                fram.repaint();
+                pan.repaint();
                 out.close();
             }
             catch(Exception a){}
@@ -159,8 +166,8 @@ public class ToolBar implements ActionListener{
                 }
                 out.close();
                 if(!cElements.isEmpty())
-                    actions.addUndoAbleAction("DLM"+cElements);                fram.repaint();
-                
+                    actions.addUndoAbleAction("DLM"+cElements);                
+                pan.repaint();
             }
             catch(Exception a){}
         }
@@ -236,7 +243,7 @@ public class ToolBar implements ActionListener{
                         }
                     }
                 }
-                fram.repaint();
+                pan.repaint();
                 // add Action.
             }
             catch(Exception a){

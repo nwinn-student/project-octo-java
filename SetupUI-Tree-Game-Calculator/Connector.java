@@ -1,6 +1,5 @@
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 import java.awt.Color;
@@ -18,7 +17,7 @@ import java.util.Arrays;
  * and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 6/7/2024
+ * @version 6/25/2024
  */
 
 
@@ -118,17 +117,16 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
         select.repaint();
     }
     /**
-     * Zooms in and out in accordance with mouse scroll wheel
+     * Initializes the position of the node.
      */
-    public void mouseWheelMoved(MouseWheelEvent e){
-    }
+    @Override
     public void mousePressed(MouseEvent e){
-        screenX = e.getXOnScreen();
-        screenY = e.getYOnScreen();
-                
-        myX = getX();
-        myY = getY();
+        screenX = e.getXOnScreen(); screenY = e.getYOnScreen();
+        myX = getX(); myY = getY();
     }
+    /**
+     * Moves the JPanels and resizes them to be at the cursor.
+     */
     @Override
     public void mouseDragged(MouseEvent e){
         isConnected=false;
@@ -173,6 +171,9 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
     public void mouseExited(MouseEvent e){}
     @Override
     public void mouseEntered(MouseEvent e){}
+    /**
+     * Connects the Node touched by the Connector to the parent Node.
+     */
     @Override
     public void mouseReleased(MouseEvent e){
         if (connParentNode != null){
@@ -215,12 +216,21 @@ public class Connector extends JPanel implements MouseListener,MouseMotionListen
     public void mouseClicked(MouseEvent e){}
     @Override
     public void mouseMoved(MouseEvent e){}
+    /**
+     * Whether a rectangle intersects with another rectangle, order doesn't matter.
+     * @param a, the first Rectangle
+     * @param b, the second Rectangle
+     * @returns boolean, whether the Rectangles are connected or not.
+     */
     private boolean fallsInside(Rectangle a, Rectangle b){
         if(a.getBounds().intersects(b.getBounds())){
             return true;
         }
         return false;
     }
+    /**
+     * Connects the JPanels to a predetermined point
+     */
     public void connectToPoint(){
         if(pos.equals("Top")){
             int h = (int)this.getSize().getHeight();

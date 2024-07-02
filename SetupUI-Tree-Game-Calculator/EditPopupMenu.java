@@ -19,15 +19,27 @@ import java.time.Instant;
 import java.util.ArrayList;
 
 /**
- * Write a description of class EditPopupMenu here.
+ * The EditPopupMenu class's purpose is to create a JPopupMenu, a small
+ * window, that appears when a user right-clicks within the bounds of the 
+ * GroupSelector object.
+ * 
+ * The popup menu consists of multiple buttons used to interact with the Node
+ * objects, such as Edit View, Duplicate, Copy, Cut, Paste, and Remove Nodes.
+ * Edit View shows an EditView object that allows the properties of the nodes
+ * to be altered, whereas duplicate doubles the amount of selected nodes, copy
+ * places a stringified version of the nodes into a clipboard, cut does the 
+ * same as copy but also removes the nodes.  Paste calls upon the clipboard and
+ * creates nodes, with remove nodes, well, removing the nodes.
+ * 
  *
  * @author Noah Winn
- * @version 6/2/2024
+ * @version 6/25/2024
  */
 public class EditPopupMenu extends JPopupMenu implements ActionListener
 {
     private JPopupMenu menuBar = null;
     private GroupSelector pan = null;
+    private ActionManager actions = null;
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
     private EditView edit = null;
     private Node edittedNode = null;
@@ -35,10 +47,12 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
      * Constructor for objects of class EditPopupMenu
      */
     public EditPopupMenu(){}
-    
-    public void createPopupMenu(GroupSelector pan){
+    /**
+     * Called by GroupSelector to initialize.
+     */
+    public void createPopupMenu(GroupSelector pan, ActionManager actions){
         this.pan = pan;
-        
+        this.actions = actions;
         addMenuItem("Edit View", this, 0);
         this.addSeparator();
         addMenuItem("Duplicate", this, KeyEvent.VK_D);
@@ -49,6 +63,13 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
         addMenuItem("Remove Nodes", this, KeyEvent.VK_DELETE);
         this.setVisible(false);
     }
+    /**
+     * Used to make JMenuItems easier to create.
+     * 
+     * @param title, the name of the JMenuItem object to be created
+     * @param parent, the JPopupMenu to add the JMenuItem object to
+     * @param key, the keyboard key necessary to activate the button w/o clicking
+     */
     private void addMenuItem(String title, JPopupMenu parent, int key){
         JMenuItem menuItem = new JMenuItem(title);
         if(key != 0){
@@ -63,9 +84,17 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
         menuItem.addActionListener(this);
         parent.add(menuItem);
     }
+    /**
+     * @param edittedNode, the node that the EditView object will look at
+     */
     public void setChosen(Node edittedNode){
         this.edittedNode = edittedNode;
     }
+    /**
+     * The actions attached via buttons all perform their own action.
+     * 
+     * @param e, the ActionEvent performed
+     */
     @Override
     public void actionPerformed(ActionEvent e){
         if(e.getActionCommand() == "Edit View"){
@@ -124,23 +153,30 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
         }
         if(e.getActionCommand() == "Cut"){
             List<Component> frameElements = Arrays.asList(pan.getComponents());
-            //Clear clipboard.txt
+            List<String> cElements = new ArrayList<>();
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
                 if(frameElements.size() < 4096){
                     for(Component elem : frameElements){
                         if(elem.getForeground() == Color.red){
+                            cElements.add(((Node)elem).toString());
+                            out.println(elem);
+                        }
+                    }
+                    for(Component elem : frameElements){
+                        if(elem.getForeground() == Color.red){
                             Node p = (Node) elem;
                             p.setBorder(blackBorder);
                             p.setForeground(Color.black);
-                            out.println(elem);
                             p.removeConnections();
                             pan.remove(elem);
                         }
                     }
                 }
-                pan.repaint();
                 out.close();
+                if(!cElements.isEmpty())
+                    actions.addUndoAbleAction("DLM"+cElements);                
+                pan.repaint();
             }
             catch(Exception a){}
         }
@@ -159,11 +195,9 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
                     }
                     // EXPECT EITHER "Panel" or "Connector"
                     if(line.substring(0,i).equals("Node")){
-                        
                         Node p = new Node();
                         p.setPanel(pan, this);
                         line = line.substring(i+1, line.length()-1);
-                        //System.out.println(line);
                         
                         String[] crd = line.split(",");
                         p.setUniqueID(Instant.parse(crd[0]));
@@ -181,7 +215,6 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
                                     }
                                 }
                             }
-                            
                             if(none){
                                 p.setConnectedNodeID(Instant.parse(crd[3]));
                                 connCheck.add(p);
@@ -200,6 +233,7 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
                         int shiftY = p.getY() + (int)p.getSize().getHeight()/5;
                         p.setLocation(shiftX, shiftY);
                         p.updateZoom();
+                        p.updateConnectionPosition();
                         pan.add(p);
                     }
                     else if(line.substring(0,i).equals("Connector")){
@@ -219,10 +253,10 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
                     }
                 }
                 pan.repaint();
-                
+                // add Action.
             }
             catch(Exception a){
-                
+                System.out.println(a);
             }
         }
         if(e.getActionCommand() == "Remove Nodes"){
