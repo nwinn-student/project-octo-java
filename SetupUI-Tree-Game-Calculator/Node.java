@@ -15,12 +15,11 @@ import java.util.ArrayList;
  * hovers, scrolls, and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 6/25/2024
+ * @version 7/3/2024
  */
 
 
-public class Node extends JPanel implements MouseListener,MouseMotionListener,MouseWheelListener
-{
+public class Node extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
     // instance variables
     private Instant uniqueID = Instant.now();
     private String name = "";
@@ -53,6 +52,7 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
      * Constructor for objects of class Panel
      */
     public Node(){
+        super();
         this.addMouseListener(this);
         
         this.addMouseMotionListener(this);
@@ -95,7 +95,9 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
     }
     public Instant getConnectedNodeID(){return connNodeID;}
     public void setConnectedNodeID(Instant connNodeID){this.connNodeID = connNodeID;}
+    @Override
     public String getName(){return name;}
+    @Override
     public void setName(String name){
         this.name = name;
         this.setToolTipText(this.getName());
@@ -176,7 +178,7 @@ public class Node extends JPanel implements MouseListener,MouseMotionListener,Mo
                 getDescNode(elem, desc);
             }
         }
-        if(desc.size() == 0){return desc;}
+        if(desc.isEmpty()){return desc;}
         return desc;
     }
     public List<Node> getDescendants(){

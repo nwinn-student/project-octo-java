@@ -3,7 +3,6 @@ import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Component;
-import java.awt.Point;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import java.util.List;
@@ -19,7 +18,7 @@ import java.awt.event.MouseEvent;
  * of JPanel type objects in order to manipulate or hold them.
  *
  * @author Noah Winn
- * @version 6/25/2024
+ * @version 7/4/2024
  */
 public class GroupSelector extends JPanel implements MouseListener,MouseMotionListener{
     // instance variables
@@ -44,6 +43,7 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
      * @param menu, the EditPopupMenu object the GroupSelector object should moderate
      */
     public GroupSelector(Frame fram, EditPopupMenu menu){
+        super();
         this.fram = fram;
         this.actions = fram.getActions();
         this.menu = menu;
@@ -188,9 +188,6 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
      * @returns boolean, whether the Rectangles are connected or not.
      */
     private boolean fallsInside(Rectangle a, Rectangle b){
-        if(a.getBounds().intersects(b.getBounds())){
-            return true;
-        }
-        return false;
+        return a.getBounds().intersects(b.getBounds());
     }
 }

@@ -10,7 +10,6 @@ import java.awt.Rectangle;
 import java.awt.Point;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
-
 /**
  * The Frame class's primary purpose is to create a JFrame, a 
  * window if you will, that can display certain information.  The 
@@ -43,7 +42,7 @@ import java.awt.event.ComponentEvent;
  * in their respective files.
  *
  * @author Noah Winn
- * @version 6/30/2024
+ * @version 7/4/2024
  */
 
 public class Frame extends JFrame implements WindowListener, ComponentListener{

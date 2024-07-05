@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.border.Border;
@@ -25,6 +26,9 @@ import java.io.PrintWriter;
 import javax.swing.KeyStroke;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 import java.time.Instant;
 /**
  * The MenuBar class sets up a collection of buttons, such as
@@ -32,10 +36,9 @@ import java.time.Instant;
  * the screen.
  *
  * @author Noah Winn
- * @version 6/30/2024
+ * @version 7/4/2024
  */
-public class MenuBar implements ActionListener
-{
+public class MenuBar implements ActionListener {
     private JMenuBar menuBar = null;
     private Frame fram = null;
     private GroupSelector pan = null;
@@ -44,6 +47,7 @@ public class MenuBar implements ActionListener
     private Integer nodeIndex = 0;
     private JMenu fileMenu, editMenu, viewMenu, testMenu, nodeMenu, helpMenu = null;
     
+    private Map filterAction = Collections.synchronizedMap(new HashMap<String, Boolean>());
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
     /**
      * Constructor for objects of class MenuBar
@@ -150,6 +154,49 @@ public class MenuBar implements ActionListener
         parent.add(menuItem);
     }
     
+    private long startTime = System.currentTimeMillis();
+    
+    class FilterThread extends Thread{
+        ActionEvent e = null;
+        FilterThread(){}
+        public void setE(ActionEvent e){
+            this.e = e;
+        }
+        @Override
+        public void run(){
+            try{
+                this.sleep(1000);
+            }catch (InterruptedException ie){
+                ie.printStackTrace();
+            }
+            
+            filterAction.put(e.getActionCommand(), false);
+            //System.out.println(filterAction+" "+(System.currentTimeMillis()-startTime)+" "+(startTime-e.getWhen()));
+        }
+    }
+    
+    /**
+     * 
+     */
+    private boolean hasFilteredActions(ActionEvent e){
+        if(filterAction.get(e.getActionCommand()) == null || filterAction.get(e.getActionCommand()).equals(false)){
+            //System.out.println(startTime-e.getWhen());
+            if((startTime-e.getWhen()) > 0){
+                return true;
+            }
+            startTime = System.currentTimeMillis();
+            filterAction.put(e.getActionCommand(), true);
+            
+            // Wait 0.5 seconds for the program to finish processing
+            FilterThread filter = new FilterThread();
+            filter.setE(e);
+            filter.start();
+            return false;
+        } else{
+            return true;
+        }
+        
+    }
     // From https://stackoverflow.com/questions/3571223
     private String getFileExtension(File file){
         String name = file.getName();
@@ -163,6 +210,9 @@ public class MenuBar implements ActionListener
     @Override
     public void actionPerformed(ActionEvent e){
         menu.setVisible(false);
+        if(hasFilteredActions(e)){
+           return;
+        }
         if(e.getActionCommand() == "New"){
             //Open up a new frame
             
@@ -419,6 +469,7 @@ public class MenuBar implements ActionListener
         else if (e.getActionCommand() == "Settings"){}
         
         else if (e.getActionCommand() == "Fullscreen"){
+            // We need another check to ensure that the screen is properly loaded
             if(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
                 // There is currently an issue where the user can spam this and the screen flashes... not fun
                 fram.dispose();
@@ -431,7 +482,6 @@ public class MenuBar implements ActionListener
                 }
                 fram.setVisible(true);
                 fram.repaint();
-                // Wait until the screen has actually properly loaded
             }
         }
         else if (e.getActionCommand() == "Zoom In"){}
