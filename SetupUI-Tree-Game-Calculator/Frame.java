@@ -42,7 +42,7 @@ import java.awt.event.ComponentEvent;
  * in their respective files.
  *
  * @author Noah Winn
- * @version 7/4/2024
+ * @version 7/9/2024
  */
 
 public class Frame extends JFrame implements WindowListener, ComponentListener{
@@ -99,14 +99,9 @@ public class Frame extends JFrame implements WindowListener, ComponentListener{
             public void eventDispatched(AWTEvent event){
                 if(screenSize.width != Toolkit.getDefaultToolkit().getScreenSize().width || screenSize.height != Toolkit.getDefaultToolkit().getScreenSize().height){
                     Dimension newSize = Toolkit.getDefaultToolkit().getScreenSize();
-                    if(fram.isUndecorated()){
-                        frameSize = new Dimension(newSize.width*frameSize.width/screenSize.width,newSize.height*frameSize.height/screenSize.height);
-                        frameLocation = new Point(newSize.width*frameLocation.x/screenSize.width,newSize.height*frameLocation.y/screenSize.height);
-                        screenSize = newSize;
-                        fram.repaint(); //Change this section to repaint() only certain segments
-                        return;
-                    }
-                    if(fram.getExtendedState() == JFrame.MAXIMIZED_BOTH){
+                    if(fram.isUndecorated() || fram.getExtendedState() == JFrame.MAXIMIZED_BOTH || 
+                        fram.getExtendedState() == JFrame.MAXIMIZED_HORIZ || fram.getExtendedState() == JFrame.MAXIMIZED_VERT){
+                        // if the state is horiz or vert maxed then when screen size becomes smaller it will become max both.
                         frameSize = new Dimension(newSize.width*frameSize.width/screenSize.width,newSize.height*frameSize.height/screenSize.height);
                         frameLocation = new Point(newSize.width*frameLocation.x/screenSize.width,newSize.height*frameLocation.y/screenSize.height);
                         screenSize = newSize;
@@ -173,10 +168,9 @@ public class Frame extends JFrame implements WindowListener, ComponentListener{
      */
     @Override
     public void componentResized(ComponentEvent c){
-        if(fram.isUndecorated()){
-            return;
-        }
-        if(fram.getExtendedState() == JFrame.MAXIMIZED_BOTH){
+        if(fram.isUndecorated() || fram.getExtendedState() == JFrame.MAXIMIZED_BOTH || 
+            fram.getExtendedState() == JFrame.MAXIMIZED_HORIZ || fram.getExtendedState() == JFrame.MAXIMIZED_VERT){
+            
             return;
         }
         if(Toolkit.getDefaultToolkit().getScreenSize().equals(screenSize)){
@@ -192,10 +186,9 @@ public class Frame extends JFrame implements WindowListener, ComponentListener{
      */
     @Override
     public void componentMoved(ComponentEvent c){
-        if(fram.isUndecorated()){
-            return;
-        }
-        if(fram.getExtendedState() == JFrame.MAXIMIZED_BOTH){
+        if(fram.isUndecorated() || fram.getExtendedState() == JFrame.MAXIMIZED_BOTH || 
+            fram.getExtendedState() == JFrame.MAXIMIZED_HORIZ || fram.getExtendedState() == JFrame.MAXIMIZED_VERT){
+            
             return;
         }
         if(Toolkit.getDefaultToolkit().getScreenSize().equals(screenSize)){
