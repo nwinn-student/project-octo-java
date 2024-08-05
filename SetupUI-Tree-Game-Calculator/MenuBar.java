@@ -36,7 +36,7 @@ import java.time.Instant;
  * the screen.
  *
  * @author Noah Winn
- * @version 7/4/2024
+ * @version 8/4/2024
  */
 public class MenuBar implements ActionListener {
     private JMenuBar menuBar = null;
@@ -46,6 +46,7 @@ public class MenuBar implements ActionListener {
     private ActionManager actions = null;
     private Integer nodeIndex = 0;
     private JMenu fileMenu, editMenu, viewMenu, testMenu, nodeMenu, helpMenu = null;
+    private Keyboard key = null;
     
     private Map filterAction = Collections.synchronizedMap(new HashMap<String, Boolean>());
     private Border blackBorder = BorderFactory.createLineBorder(Color.BLACK);
@@ -53,7 +54,36 @@ public class MenuBar implements ActionListener {
      * Constructor for objects of class MenuBar
      */
     public MenuBar(){}
-    
+    /**
+     * Source: https://stackoverflow.com/a/69120392
+     * Allows the user to know when a key sequence is being pressed and released
+     * The below approach is kilometers better than the previous approach using Threads.
+     * When a Preferences or Settings UI is added, delayMillis will be customizable by the user,
+     * at least that is the plan.
+     */
+    class Keyboard{
+        private static final Map<String, Long> pressedKeys = new HashMap<>();
+        private static int delayMillis = 500;
+        static {
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(event -> {
+                synchronized (Keyboard.class){
+                    if(event.getID() == KeyEvent.KEY_PRESSED){
+                        long previousWhen = pressedKeys.getOrDefault(event.getKeyText(event.getKeyCode())+event.getKeyModifiersText(event.getModifiers()), event.getWhen() - 800);
+                        if(event.getWhen() - previousWhen < delayMillis){
+                            event.consume();
+                            return false;
+                        }
+                        pressedKeys.put(event.getKeyText(event.getKeyCode())+event.getKeyModifiersText(event.getModifiers()), event.getWhen());
+                    }else if(event.getID() == KeyEvent.KEY_RELEASED) pressedKeys.remove(event.getKeyText(event.getKeyCode())+event.getKeyModifiersText(event.getModifiers()));
+                    else if(event.getID() == KeyEvent.KEY_TYPED) event.consume();
+                    return false;
+                }
+            });
+        }
+        public static boolean isKeyPressed(String keyStroke){
+            return pressedKeys.getOrDefault(keyStroke, null) != null;
+        }
+    }
     public void createMenuBar(Frame fram, GroupSelector pan, EditPopupMenu menu){
         this.fram = fram;
         this.actions = fram.getActions();
@@ -107,6 +137,7 @@ public class MenuBar implements ActionListener {
         addMenuItem("About", helpMenu, 0, "...");
         
         fram.setJMenuBar(menuBar);
+        key = new Keyboard();
     }
     
     /**
@@ -154,49 +185,6 @@ public class MenuBar implements ActionListener {
         parent.add(menuItem);
     }
     
-    private long startTime = System.currentTimeMillis();
-    
-    class FilterThread extends Thread{
-        ActionEvent e = null;
-        FilterThread(){}
-        public void setE(ActionEvent e){
-            this.e = e;
-        }
-        @Override
-        public void run(){
-            try{
-                this.sleep(1000);
-            }catch (InterruptedException ie){
-                ie.printStackTrace();
-            }
-            
-            filterAction.put(e.getActionCommand(), false);
-            //System.out.println(filterAction+" "+(System.currentTimeMillis()-startTime)+" "+(startTime-e.getWhen()));
-        }
-    }
-    
-    /**
-     * 
-     */
-    private boolean hasFilteredActions(ActionEvent e){
-        if(filterAction.get(e.getActionCommand()) == null || filterAction.get(e.getActionCommand()).equals(false)){
-            //System.out.println(startTime-e.getWhen());
-            if((startTime-e.getWhen()) > 0){
-                return true;
-            }
-            startTime = System.currentTimeMillis();
-            filterAction.put(e.getActionCommand(), true);
-            
-            // Wait 0.5 seconds for the program to finish processing
-            FilterThread filter = new FilterThread();
-            filter.setE(e);
-            filter.start();
-            return false;
-        } else{
-            return true;
-        }
-        
-    }
     // From https://stackoverflow.com/questions/3571223
     private String getFileExtension(File file){
         String name = file.getName();
@@ -210,9 +198,7 @@ public class MenuBar implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e){
         menu.setVisible(false);
-        if(hasFilteredActions(e)){
-           return;
-        }
+        
         if(e.getActionCommand() == "New"){
             //Open up a new frame
             
