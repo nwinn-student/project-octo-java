@@ -6,7 +6,7 @@ WARNING: Currently not optimized with regard to CPU or memory usage.
 
 ## How to Use (Regular Use)
 1. Ensure that you have Java on your computer, [OpenJDK](https://openjdk.org/) or [OracleJDK](https://www.oracle.com/java/technologies/downloads/).  For users you only need a JRE, not a JDK.
-2. Download [`TreeGameCalcDesigner`](https://github.com/nwinn-student/project-octo-java/tree/main/SetupUI-Tree-Game-Calculator/TreeGameCalcDesigner), unzip it, and then open Tree-Game-Calc-Design.jar.  Keep the jar file within the folder, since it writes to clipboard.txt currently.
+2. Download [`TreeGameCalcDesigner`](https://github.com/nwinn-student/project-octo-java/tree/main/SetupUI-Tree-Game-Calculator/TreeGameCalcDesigner.zip), unzip it, and then open Tree-Game-Calc-Design.jar.  Keep the jar file within the folder, since it writes to clipboard.txt currently.
 You can choose to leave the folder zipped, but it may lose some functionality, like cutting and copying.
 
 ## How to Use (Developer Use)
