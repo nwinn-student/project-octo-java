@@ -1,10 +1,16 @@
 # Setup UI Tree Game Calculator
 
-Currently prioritized.
+Currently prioritized, not stably released so expect bugs or incomplete sections.
 
-## How to Use
+WARNING: Currently not optimized with regard to CPU or memory usage.
+
+## How to Use (Regular Use)
+1. Ensure that you have Java on your computer, [OpenJDK](https://openjdk.org/) or [OracleJDK](https://www.oracle.com/java/technologies/downloads/).  For users you only need a JRE, not a JDK.
+2. Download [`TreeGameCalcDesigner`](https://github.com/nwinn-student/project-octo-java/tree/main/SetupUI-Tree-Game-Calculator/TreeGameCalcDesigner) and open Tree-Game-Calc-Design.jar.  Keep the jar file within the folder, since it writes to clipboard.txt currently.  
+
+## How to Use (Developer Use)
 1. Ensure that you have Java on your computer, [OpenJDK](https://openjdk.org/) or [OracleJDK](https://www.oracle.com/java/technologies/downloads/).
-2. Sample text.  <For when a stable release has occured and a .jar file exists>.
+2. Download [`Setup-Tree UI`](https://github.com/nwinn-student/project-octo-java/tree/main/SetupUI-Tree-Game-Calculator) and open up the folder using an IDE, such as BlueJ or Geany or VIM.
 
 ## Acknowledgements/Inspirations
 
