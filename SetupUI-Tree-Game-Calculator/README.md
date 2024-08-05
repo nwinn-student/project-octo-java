@@ -28,6 +28,6 @@ For Windows visually impaired users without NVDA set up for Java applications:
 
 1. Navigate to Control Panel.
 2. Navigate to Ease of Access: Optimize Visual Display.
-3. Traverse to until you hear Enable Java Access Bridge
-4. Apply these changes.  Congratulations, you can now ear much more information regarding various applications than you could previously.
+3. Traverse downwards until you hear Enable Java Access Bridge.
+4. Apply these changes.  Congratulations, you can now hear much more information regarding various applications than you could previously.
 
