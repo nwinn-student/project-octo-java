@@ -10,6 +10,8 @@ import java.awt.Rectangle;
 import java.awt.Point;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import javax.swing.JToolBar;
+
 /**
  * The Frame class's primary purpose is to create a JFrame, a 
  * window if you will, that can display certain information.  The 
@@ -42,7 +44,7 @@ import java.awt.event.ComponentEvent;
  * in their respective files.
  *
  * @author Noah Winn
- * @version 7/9/2024
+ * @version 8/8/2024
  */
 
 public class Frame extends JFrame implements WindowListener, ComponentListener{
@@ -53,6 +55,7 @@ public class Frame extends JFrame implements WindowListener, ComponentListener{
     private Point frameLocation = null;
     private EditPopupMenu popupMenu = new EditPopupMenu();
     private ActionManager actions = new ActionManager();
+    private JToolBar toolBar = null;
     /**
      * Constructor for objects of class Frame
      * Titles the Frame class and initializes it.
@@ -65,7 +68,7 @@ public class Frame extends JFrame implements WindowListener, ComponentListener{
      * Called by the constructors to initialize the Frame properly with the necessary
      * features.
      */
-    protected void initializeFrame(){
+    public void initializeFrame(){
         //this.setTitle(); // For later when user can open files and probably in MenuBar instead?
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -80,11 +83,12 @@ public class Frame extends JFrame implements WindowListener, ComponentListener{
         GroupSelector pan3 = new GroupSelector(this, popupMenu);
         
         //Creates menu components
+        ToolBar tool = new ToolBar();
+        tool.createToolBar(this, pan3, popupMenu);
+        
         MenuBar menu = new MenuBar();
         menu.createMenuBar(this, pan3, popupMenu);
         
-        ToolBar tool = new ToolBar();
-        tool.createToolBar(this, pan3, popupMenu);
         
         actions.setPanel(pan3, popupMenu);
         
@@ -128,6 +132,16 @@ public class Frame extends JFrame implements WindowListener, ComponentListener{
      * @return the actionManager for this frame
      */
     public ActionManager getActions(){return actions;}
+    /**
+     * Retrieves the toolBar object, which is used to mimic the menuBar and provide ease of access
+     * @return the toolBar for this frame
+     */
+    public JToolBar getToolbar(){return toolBar;}
+    /**
+     * Setter for the toolBar
+     * @param toolBar, the toolBar for this frame
+     */
+    public void setToolBar(JToolBar toolBar){this.toolBar = toolBar;}
     /**
      * Hides the popupMenu when it is visible, activates whenever the window is clicked
      * out of.

@@ -4,16 +4,18 @@ import javax.swing.JMenuItem;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-
-
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.JFrame;
+import java.awt.Component;
+import java.awt.BorderLayout;
+import java.awt.KeyboardFocusManager;
+import java.awt.GraphicsEnvironment;
+import java.awt.Color;
+import java.awt.Event;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory;
 import javax.swing.event.ChangeEvent;
@@ -22,6 +24,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import javax.swing.JToolBar;
 
 import javax.swing.KeyStroke;
 import java.util.List;
@@ -36,13 +39,15 @@ import java.time.Instant;
  * the screen.
  *
  * @author Noah Winn
- * @version 8/4/2024
+ * @version 8/8/2024
  */
 public class MenuBar implements ActionListener {
     private JMenuBar menuBar = null;
     private Frame fram = null;
+    private JFrame fullscreenFrame = null;
     private GroupSelector pan = null;
     private EditPopupMenu menu = null;
+    private JToolBar tool = null;
     private ActionManager actions = null;
     private Integer nodeIndex = 0;
     private JMenu fileMenu, editMenu, viewMenu, testMenu, nodeMenu, helpMenu = null;
@@ -86,9 +91,13 @@ public class MenuBar implements ActionListener {
     }
     public void createMenuBar(Frame fram, GroupSelector pan, EditPopupMenu menu){
         this.fram = fram;
+        fullscreenFrame = new JFrame();
+        fullscreenFrame.setUndecorated(true);
+        fullscreenFrame.setVisible(false);
         this.actions = fram.getActions();
         this.pan = pan;
         this.menu = menu;
+        this.tool = fram.getToolbar();
         menuBar = new JMenuBar();
         
         fileMenu = addMenu("File", menuBar, KeyEvent.VK_F, "Use Alt-F to select File."); //ALT-F
@@ -455,19 +464,21 @@ public class MenuBar implements ActionListener {
         else if (e.getActionCommand() == "Settings"){}
         
         else if (e.getActionCommand() == "Fullscreen"){
-            // We need another check to ensure that the screen is properly loaded
             if(GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
-                // There is currently an issue where the user can spam this and the screen flashes... not fun
-                fram.dispose();
-                fram.setUndecorated(!fram.isUndecorated());
-                if(fram.isUndecorated()){
-                    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(fram);
+                if(fram.isVisible()){
+                    fram.setVisible(false);
+                    fullscreenFrame.add(pan);
+                    fullscreenFrame.add(tool, BorderLayout.PAGE_START);
+                    fullscreenFrame.setJMenuBar(menuBar);
+                    GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(fullscreenFrame);
                 } else{
+                    fram.add(pan);
+                    fram.setVisible(true);
+                    fram.add(tool, BorderLayout.PAGE_START);
+                    fram.setJMenuBar(menuBar);
                     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);
-                    fram.updateScreensize();
+                    fullscreenFrame.setVisible(false);
                 }
-                fram.setVisible(true);
-                fram.repaint();
             }
         }
         else if (e.getActionCommand() == "Zoom In"){}

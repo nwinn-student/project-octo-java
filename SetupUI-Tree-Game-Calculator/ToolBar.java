@@ -5,7 +5,7 @@
  * the screen.
  *
  * @author Noah Winn
- * @version 6/25/2024
+ * @version 8/8/2024
  */
 import javax.swing.JToolBar;
 import javax.swing.JButton;
@@ -56,6 +56,7 @@ public class ToolBar implements ActionListener{
         addButton("Paste", toolBar, "Use Control-V to use Paste, pastes in the previously copied or cut nodes.");
         toolBar.getAccessibleContext().setAccessibleName("Tool Bar");
         fram.add(toolBar, BorderLayout.PAGE_START);
+        fram.setToolBar(toolBar);
     }
     /**
      * Used to make JButtons easier to create.
