@@ -2,7 +2,8 @@
 
 Currently prioritized, not stably released so expect bugs or incomplete sections.
 
-WARNING: Currently not optimized with regard to CPU or memory usage.
+> [!WARNING]
+> Currently not optimized with regard to CPU or memory usage.
 
 ## How to Use (Regular Use)
 1. Ensure that you have Java on your computer, [OpenJDK](https://openjdk.org/) or [OracleJDK](https://www.oracle.com/java/technologies/downloads/).  For users you only need a JRE, not a JDK.
@@ -30,4 +31,12 @@ For Windows visually impaired users without NVDA set up for Java applications:
 2. Navigate to Ease of Access: Optimize Visual Display.
 3. Traverse downwards until you hear Enable Java Access Bridge.
 4. Apply these changes.  Congratulations, you can now hear much more information regarding various applications than you could previously.
+
+## Features
+
+A list of features is provided below to provide information about what exists and what to expect.  Not complete.
+| Feature | How to Use | Explanation |
+| Undo/Redo Action | Click CTRL-Z for Undo and CTRL-Y for Redo | Allows for the user to undo or redo an action performed to a node, such as moving, creating, deleting, and editting.  The undo/redo feature is not like most, in that redo is not wiped after an action is performed. |
+| Fullscreen | Click F11 to Fullscreen | Allows the user to enter fullscreen mode, which can be exitted by clicking F11 again |
+
 
