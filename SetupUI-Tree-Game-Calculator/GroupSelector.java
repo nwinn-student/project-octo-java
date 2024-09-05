@@ -10,6 +10,9 @@ import java.util.Arrays;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 /**
  * The GroupSelector class has JPanel objects attached to it, responding to clicks 
@@ -18,9 +21,9 @@ import java.awt.event.MouseEvent;
  * of JPanel type objects in order to manipulate or hold them.
  *
  * @author Noah Winn
- * @version 7/4/2024
+ * @version 9/4/2024
  */
-public class GroupSelector extends JPanel implements MouseListener,MouseMotionListener{
+public class GroupSelector extends JPanel implements MouseListener,MouseMotionListener, KeyListener{
     // instance variables
     private int screenX = 0;
     private int screenY = 0;
@@ -36,6 +39,9 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
     private Border redBorder = BorderFactory.createLineBorder(Color.RED,3);
     
     private JPanel rect = null;
+    private List<Node> selectedNodes = new ArrayList<>();
+    private List<Node> nodes = new ArrayList<>();
+    private Integer nodeDefaultIndex = 0;
     /**
      * Constructor for objects of class GroupSelector
      * 
@@ -49,6 +55,7 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
         this.menu = menu;
         addMouseListener(this);
         addMouseMotionListener(this);
+        addKeyListener(this);
         this.setLayout(null);
         this.setOpaque(true);
         this.setPreferredSize(new Dimension(500,500));
@@ -59,6 +66,65 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
         this.setLocation(0,0);
         this.setFocusable(true);
         menu.createPopupMenu(this, actions);
+    }
+    public Integer getNodeIndex(){
+        return nodeDefaultIndex;
+    }
+    public void incrementNodeIndex(){
+        nodeDefaultIndex++;
+        if(nodeDefaultIndex > Math.pow(2,15)) nodeDefaultIndex = 0;
+    }
+    public List<Node> getSelected(){
+        if(selectedNodes.size() > 4096){
+            selectedNodes.clear(); //?
+            return selectedNodes;
+        } else{
+            return selectedNodes;
+        }
+    }
+    public void addSelected(Node node){
+        if(selectedNodes.size() > 4096) return;
+        node.setForeground(Color.red);
+        node.setBorder(redBorder);
+        selectedNodes.add(node);
+    }
+    public void removeSelected(Node node){
+        node.setForeground(Color.black);
+        node.setBorder(blackBorder);
+        selectedNodes.remove(node);
+    }
+    public void clearSelected(){
+        for(Node elem : selectedNodes){
+            elem.setForeground(Color.black);
+            elem.setBorder(blackBorder);
+        }
+        selectedNodes.clear();
+    }
+    public void sweepSelected(){
+        // clears selected and removes the nodes
+        for(Node elem : selectedNodes){
+            remove(elem);
+        }
+        selectedNodes.clear();
+    }
+    public List<Node> getNodes(){
+        return nodes;
+    }
+    public Component add(Node node){
+        nodes.add(node);
+        return super.add(node);
+    }
+    public void remove(Node node){
+        nodes.remove(node);
+        node.removeConnections();
+        // expected for node to be removed from selected
+        super.remove(node);
+    }
+    public void clearNodes(){
+        for(Node node : nodes){
+            node.removeConnections();
+        }
+        nodes.clear();
     }
     /**
      * Retrieves the ActionManager object, which is used for undoing and redoing actions.
@@ -106,26 +172,16 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
         } else if(x > 0 && y > 0){
             rect.setBounds(myX-x,myY-y,x, y);
         }
-        //Highlight all within rectangle
-        List<Component> frameElements = Arrays.asList(this.getComponents());
-        if(frameElements.size() < 4096){
-            for(Component elem : frameElements){
-                if(elem.getClass().equals(Node.class)){
-                    if(fallsInside(rect.getBounds(),elem.getBounds())){
-                        //Change foreground and border back to black
-                        Node p = (Node) elem;
-                        p.setBorder(redBorder);
-                        elem.setForeground(Color.red);
-                    } else{
-                        Node p = (Node) elem;
-                        p.setBorder(blackBorder);
-                        elem.setForeground(Color.black);
-                    }
-                }
+        //Highlight all nodes within rectangle
+        for(Node elem : nodes){
+            if(fallsInside(rect.getBounds(), elem.getBounds())){
+                addSelected(elem);
+            } else {
+                removeSelected(elem);
             }
         }
         menu.setVisible(false);
-        this.repaint(); // maybe useless
+        //this.repaint(); // maybe useless
     }
     @Override
     public void mouseExited(MouseEvent e){}
@@ -150,29 +206,11 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
     @Override
     public void mouseClicked(MouseEvent e){
         if (e.getButton() == MouseEvent.BUTTON1){
-            List<Component> frameElements = Arrays.asList(this.getComponents());
-            if(frameElements.size() < 4096){
-                for(Component elem : frameElements){
-                    if(elem.getClass().equals(Node.class)){
-                        Node p = (Node) elem;
-                        p.setBorder(blackBorder);
-                        elem.setForeground(Color.black);
-                    }
-                }
-            }
+            clearSelected();
             menu.setVisible(false);
         }
-        if(e.getButton() == MouseEvent.BUTTON3){
-            List<Component> frameElements = Arrays.asList(this.getComponents());
-            if(frameElements.size() < 4096){
-                for(Component elem : frameElements){
-                    if(elem.getClass().equals(Node.class)){
-                        Node p = (Node) elem;
-                        p.setBorder(blackBorder);
-                        elem.setForeground(Color.black);
-                    }
-                }
-            }
+        if(e.getButton() == MouseEvent.BUTTON3){            
+            clearSelected();
             menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
             menu.setVisible(true);
         }
@@ -181,6 +219,34 @@ public class GroupSelector extends JPanel implements MouseListener,MouseMotionLi
     }
     @Override
     public void mouseMoved(MouseEvent e){}
+    @Override
+    public void keyReleased(KeyEvent e){
+        // check if a node is selected, if not then cycle through the nodes, and instead call keyReleased on Node
+        // tab should be the key used to cycle, but I will use arrow keys (it'll go to closest and highlight it some color)
+        // if a node is selected, then arrow keys can move the nodes around
+        if(e.getKeyCode() == 40){
+            // down
+            if(selectedNodes.size() > 0){
+                
+            } else {
+                // node below
+            }
+        } else if(e.getKeyCode() == 39){
+            //right
+        } else if(e.getKeyCode() == 38){
+            //up
+        } else if(e.getKeyCode() == 37){
+            //left   
+        } else if(e.getKeyCode() == 10){
+            // select the current node, pressed "Enter"
+        }
+        //System.out.println(e);
+        //System.out.println(selectedNodes);
+    }
+    @Override
+    public void keyPressed(KeyEvent e){}
+    @Override
+    public void keyTyped(KeyEvent e){}
     /**
      * Whether a rectangle intersects with another rectangle, order doesn't matter.
      * @param a, the first Rectangle

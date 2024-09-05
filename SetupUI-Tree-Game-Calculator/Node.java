@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * hovers, scrolls, and drags to increase functionality.
  *
  * @author Noah Winn
- * @version 7/3/2024
+ * @version 9/4/2024
  */
 
 
@@ -84,12 +84,9 @@ public class Node extends JPanel implements MouseListener, MouseMotionListener, 
                 }
             }
         }
-        //System.out.println("Parent:"+parentNode);
         this.parentNode = parentNode;
         this.setConnectedNodeID(parentNode.getUniqueID());
-        parentNode.addChild(this);
-        // Update stuff?
-        
+        parentNode.addChild(this);        
         this.updateConnections();
         this.updateConnectionPosition();
     }
@@ -107,7 +104,8 @@ public class Node extends JPanel implements MouseListener, MouseMotionListener, 
     public List<String> getFormulas(){return formulas;}
     public void appendFormulas(String form){formulas.add(form);}
     public void setFormulas(List<String> formulas){this.formulas = formulas;}
-    
+    public Connector getTop(){return top;}
+    public Connector getBottom(){return bottom;}
     public void setPanel(GroupSelector select, EditPopupMenu menu){
         this.select = select;
         this.actions = select.getActions();
@@ -152,7 +150,7 @@ public class Node extends JPanel implements MouseListener, MouseMotionListener, 
     }
     public void addChild(Node child){
         if(childrenNodes == null){
-            childrenNodes = new ArrayList<>();
+            childrenNodes.clear();
         }
         //System.out.println("Added"+child.toString());
         if(child.getUniqueID() == this.getUniqueID()){return;}
@@ -172,7 +170,6 @@ public class Node extends JPanel implements MouseListener, MouseMotionListener, 
         }
         if (node.getChildren() == null || node.getChildren().isEmpty()){return desc;} 
         for(Node elem : node.getChildren()){
-            //String na = elem.getName();
             desc.add(elem);
             if(elem.getChildren() != null && !elem.getChildren().isEmpty()){
                 getDescNode(elem, desc);
@@ -230,26 +227,17 @@ public class Node extends JPanel implements MouseListener, MouseMotionListener, 
             setLocation(myX + deltaX, myY + deltaY);
             if(this.getForeground() == Color.red){
                 // Move other selected pieces, should this item be selected?
-                List<Component> frameElements = Arrays.asList(select.getComponents());
-                if(frameElements.size() < 4096){
-                    for(Component elem : frameElements){
-                        if(elem.getForeground() == Color.red && elem != this){
-                            Node p = (Node) elem;
-                            p.shiftLocation(deltaX, deltaY);
-                        }
-                    }
+                select.removeSelected(this);
+                for(Node elem : select.getSelected()){
+                    elem.shiftLocation(deltaX, deltaY);
                 }
+                select.addSelected(this);
             } else {
-                List<Component> frameElements = Arrays.asList(select.getComponents());
-                if(frameElements.size() < 4096){
-                    for(Component elem : frameElements){
-                        if(elem.getClass().equals(Node.class)){
-                            Node p = (Node) elem;
-                            p.setBorder(blackBorder);
-                            elem.setForeground(Color.black);
-                        }
-                    }
+                for(Node elem : select.getSelected()){
+                    elem.setBorder(blackBorder);
+                    elem.setForeground(Color.black);
                 }
+                select.clearSelected();                
             }
             top.updatePosition();
             bottom.updatePosition();
@@ -275,19 +263,12 @@ public class Node extends JPanel implements MouseListener, MouseMotionListener, 
         myX = getX();
         myY = getY();
         if(this.getForeground() == Color.red){
-            List<Component> frameElements = Arrays.asList(select.getComponents());
-            List<Component> cElements = new ArrayList<>();
-            if(frameElements.size() < 4096){
-                for(Component elem : frameElements){
-                    if(elem.getForeground() == Color.red && elem != this){
-                        Node p = (Node) elem;
-                        p.updateLocation();
-                        cElements.add(p);
-                    }
-                }
-            }
-            actions.addUndoAbleAction("MOV"+cElements); // ?
-        } else {actions.addUndoAbleAction("MOV"+this);}
+            select.removeSelected(this);
+            //actions.addUndoableAction("MOV"+select.getSelected()); // ?
+            select.addSelected(this);
+        } else {
+            //actions.addUndoableAction("MOV"+this);
+        }
     }
     /**
      * Swaps whether the node is selected or not OR pops up the popup menu.
@@ -298,10 +279,12 @@ public class Node extends JPanel implements MouseListener, MouseMotionListener, 
             if(getForeground().equals(Color.red)){
                 this.setBorder(blackBorder);
                 this.setForeground(Color.black);
+                select.removeSelected(this);
             }
             else{
                 this.setBorder(redBorder);
                 this.setForeground(Color.red);
+                select.addSelected(this);
             }
             if(menu != null){
                 menu.setChosen(null);
@@ -311,18 +294,14 @@ public class Node extends JPanel implements MouseListener, MouseMotionListener, 
             //System.out.println("Middle button clicked");
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             //System.out.println("Right button clicked");
-            List<Component> frameElements = Arrays.asList(select.getComponents());
-            if(frameElements.size() < 4096){
-                for(Component elem : frameElements){
-                    if(elem.getClass().equals(Node.class)){
-                        Node p = (Node) elem;
-                        p.setBorder(blackBorder);
-                        elem.setForeground(Color.black);
-                    }
-                }
+            for(Node elem : select.getSelected()){
+                elem.setBorder(blackBorder);
+                elem.setForeground(Color.black);
             }
+            select.clearSelected();
             this.setBorder(redBorder);
             this.setForeground(Color.red);
+            select.addSelected(this);
             menu.setLocation(e.getXOnScreen(), e.getYOnScreen());
             menu.setChosen(this);
             menu.setVisible(true);
@@ -337,6 +316,7 @@ public class Node extends JPanel implements MouseListener, MouseMotionListener, 
      * @param deltaY, how much the node was shifted in the Y direction
      */
     public void shiftLocation(int deltaX, int deltaY){
+        //updateLocation();
         setLocation(myX + deltaX, myY + deltaY);
         top.updatePosition();
         bottom.updatePosition();

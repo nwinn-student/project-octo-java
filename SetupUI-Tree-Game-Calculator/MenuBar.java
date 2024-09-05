@@ -39,7 +39,7 @@ import java.time.Instant;
  * the screen.
  *
  * @author Noah Winn
- * @version 8/8/2024
+ * @version 9/5/2024
  */
 public class MenuBar implements ActionListener {
     private JMenuBar menuBar = null;
@@ -49,7 +49,6 @@ public class MenuBar implements ActionListener {
     private EditPopupMenu menu = null;
     private JToolBar tool = null;
     private ActionManager actions = null;
-    private Integer nodeIndex = 0;
     private JMenu fileMenu, editMenu, viewMenu, testMenu, nodeMenu, helpMenu = null;
     private Keyboard key = null;
     
@@ -137,9 +136,10 @@ public class MenuBar implements ActionListener {
         addMenuItem("Display Sample Formula", testMenu, 0, "...");
         addMenuItem("Display Sample Tree", testMenu, 0, "...");
         
-        addMenuItem("Add Game Node", nodeMenu, 0, "Creates a new node.");
+        addMenuItem("Select All Nodes", nodeMenu, KeyEvent.VK_A, "Use Control-A to select all nodes.");
+        addMenuItem("Add Game Node", nodeMenu, KeyEvent.VK_INSERT, "Use Insert to use Add Game Node, creates a new node."); // INSERT
         addMenuItem("Remove Game Node", nodeMenu, KeyEvent.VK_DELETE, "Use Delete to use Remove Game Node, deletes the currently selected nodes.");
-        addMenuItem("Remove All Node", nodeMenu, 0, "Deletes all of the current nodes on the screen.");
+        addMenuItem("Remove All Nodes", nodeMenu, 0, "Deletes all of the current nodes on the screen.");
         
         addMenuItem("Components", helpMenu, 0, "...");
         addMenuItem("Documentation", helpMenu, 0, "...");
@@ -179,10 +179,8 @@ public class MenuBar implements ActionListener {
     private void addMenuItem(String title, JMenu parent, int key, String description){
         JMenuItem menuItem = new JMenuItem(title);
         if(key != 0){
-            if(title.equals("Remove Game Node")){
+            if(title.equals("Remove Game Node") || title.equals("Fullscreen") || title.equals("Add Game Node")){
                menuItem.setAccelerator(KeyStroke.getKeyStroke(key, 0));
-            } else if(title.equals("Fullscreen")){
-                menuItem.setAccelerator(KeyStroke.getKeyStroke(key, 0));
             } else{
                  //Key is not undefined, will always require CTRL
                 menuItem.setAccelerator(KeyStroke.getKeyStroke(key, Event.CTRL_MASK));
@@ -317,74 +315,50 @@ public class MenuBar implements ActionListener {
         }
         
         else if (e.getActionCommand() == "Undo"){
-            try {actions.undo();}
-            catch(Exception a) {System.out.println("Error: "+a);}
+            //try {actions.undo();}
+            //catch(Exception a) {System.out.println("Error: "+a);}
+            actions.undo();
         } else if (e.getActionCommand() == "Redo"){
-            try {actions.redo();}
-            catch(Exception a) {System.out.println("Error: "+a);}
+            //try {actions.redo();}
+            //catch(Exception a) {System.out.println("Error: "+a);}
+            actions.redo();
         } else if (e.getActionCommand() == "Duplicate"){
-            List<Component> frameElements = Arrays.asList(pan.getComponents());
-            if(frameElements.size() < 4096){
-                for(Component elem : frameElements){
-                    if(elem.getForeground() == Color.red){
-                        elem.setForeground(Color.black);
-                        Node p = (Node) elem;
-                        p.setBorder(blackBorder);
-                        Node copy = new Node();
-                        copy.setBounds(p.getBounds());
-                        int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
-                        int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
-                        copy.setLocation(shiftX, shiftY);
-                        copy.setPanel(pan, menu);
-                        copy.updateZoom();
-                        pan.add(copy);
-                    }
-                }
+            List<String> cElements = new ArrayList<>();
+            for(Node elem : pan.getSelected()){
+                Node copy = new Node();
+                copy.setBounds(elem.getBounds());
+                int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
+                int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
+                copy.setLocation(shiftX, shiftY);
+                // may need to do more here since they bunch up when dragged instead of moving regularly, 
+                copy.setPanel(pan, menu);
+                copy.updateZoom();
+                copy.setName("#"+pan.getNodeIndex().toString());
+                pan.incrementNodeIndex();
+                cElements.add(copy.toString());
+                pan.add(copy);
             }
+            pan.clearSelected();
+            if(!cElements.isEmpty())
+                actions.addUndoableAction("MKS"+cElements);
             pan.repaint();
         } else if (e.getActionCommand() == "Copy"){
-            List<Component> frameElements = Arrays.asList(pan.getComponents());
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
-                if(frameElements.size() < 4096){
-                    for(Component elem : frameElements){
-                        if(elem.getForeground() == Color.red){
-                            Node p = (Node) elem;
-                            p.setBorder(blackBorder);
-                            p.setForeground(Color.black);
-                            out.println(elem);
-                        }
-                    }
-                }
-                pan.repaint();
+                out.println(pan.getSelected());
                 out.close();
+                pan.clearSelected();
+                pan.repaint();
             }
             catch(Exception a){}
         } else if (e.getActionCommand() == "Cut"){
-            List<Component> frameElements = Arrays.asList(pan.getComponents());
-            List<String> cElements = new ArrayList<>();
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
-                if(frameElements.size() < 4096){
-                    for(Component elem : frameElements){
-                        if(elem.getForeground() == Color.red){
-                            cElements.add(((Node)elem).toString());
-                            out.println(elem);
-                        }
-                    }
-                    for(Component elem : frameElements){
-                        if(elem.getForeground() == Color.red){
-                            Node p = (Node) elem;
-                            p.setBorder(blackBorder);
-                            p.setForeground(Color.black);
-                            p.removeConnections();
-                            pan.remove(elem);
-                        }
-                    }
-                }
+                out.println(pan.getSelected());
                 out.close();
-                if(!cElements.isEmpty())
-                    actions.addUndoAbleAction("DLM"+cElements);
+                if(!pan.getSelected().isEmpty())
+                    actions.addUndoableAction("DLM"+pan.getSelected());
+                pan.sweepSelected();
                 pan.repaint();
             }
             catch(Exception a){}
@@ -411,16 +385,12 @@ public class MenuBar implements ActionListener {
                         p.setUniqueID(Instant.parse(crd[0]));
                         p.setName(crd[1]);
 
-                        List<Component> frameElements = Arrays.asList(pan.getComponents());
-                        if(!Instant.parse(crd[0]).equals(Instant.parse(crd[3])) 
-                            && frameElements.size() < 4096) {
+                        if(!Instant.parse(crd[0]).equals(Instant.parse(crd[3]))) {
                             boolean none = true;
-                            for(Component elem : frameElements){
-                                if(elem.getClass().equals(Node.class)){
-                                    if(((Node)elem).getUniqueID().equals(Instant.parse(crd[3]))){
-                                        none = false;
-                                        p.setParentNode((Node)elem);
-                                    }
+                            for(Node elem : pan.getNodes()){
+                                if(elem.getUniqueID().equals(Instant.parse(crd[3]))){
+                                    none=false;
+                                    elem.setParentNode(elem);
                                 }
                             }
                             if(none){
@@ -445,13 +415,9 @@ public class MenuBar implements ActionListener {
                 }
                 scan.close();
                 for(Node nod : connCheck){
-                    List<Component> frameElements = Arrays.asList(pan.getComponents());
-                    for(Component elem : frameElements){
-                        if(elem.getClass().equals(Node.class)){
-                            Node z = (Node)elem;
-                            if(z.getUniqueID().equals(nod.getConnectedNodeID())){
-                                nod.setParentNode(z);
-                            }
+                    for(Node elem : pan.getNodes()){
+                        if(elem.getUniqueID().equals(nod.getConnectedNodeID())){
+                            nod.setParentNode(elem);
                         }
                     }
                 }
@@ -491,49 +457,28 @@ public class MenuBar implements ActionListener {
         else if (e.getActionCommand() == "Display Sample Formula"){}
         else if (e.getActionCommand() == "Display Sample Tree"){}
         
-        else if (e.getActionCommand() == "Add Game Node"){
+        else if(e.getActionCommand() == "Select All Nodes"){
+            for(Node elem : pan.getNodes()){
+                pan.addSelected(elem);
+            }
+        } else if (e.getActionCommand() == "Add Game Node"){
             Node p = new Node();
             p.setPanel(pan, menu);
-            p.setName("#"+nodeIndex.toString());
-            nodeIndex++;
-            actions.addUndoAbleAction("MKS"+p.toString());
+            p.setName("#"+pan.getNodeIndex().toString());
+            pan.incrementNodeIndex();
+            actions.addUndoableAction("MKS["+p.toString()+"]");
             pan.add(p);
             pan.repaint();
         } else if (e.getActionCommand() == "Remove Game Node"){
-            List<Component> frameElements = Arrays.asList(pan.getComponents());
-            List<String> cElements = new ArrayList<>();
-            for(Component elem : frameElements){
-                if(elem.getForeground() == Color.red){
-                    Node p = (Node) elem;
-                    cElements.add(p.toString());
-                }
-            }
-            for(Component elem : frameElements){
-                if(elem.getForeground() == Color.red){
-                    ((Node)elem).removeConnections();
-                    pan.remove(elem);
-                }
-            }
-            if(!cElements.isEmpty())
-                actions.addUndoAbleAction("DLM"+cElements);
+            if(!pan.getSelected().isEmpty())
+                actions.addUndoableAction("DLM"+pan.getSelected());
+            pan.sweepSelected();
             pan.repaint();
-        } else if (e.getActionCommand() == "Remove All Node"){
-            List<Component> frameElements = Arrays.asList(pan.getComponents());
-            List<String> cElements = new ArrayList<>();
-            for(Component elem : frameElements){
-                if(elem.getForeground() == Color.red){
-                    Node p = (Node) elem;
-                    cElements.add(p.toString());
-                }
-            }
-            for(Component elem : frameElements){
-                if(elem.getForeground() == Color.red){
-                    ((Node)elem).removeConnections();
-                    pan.remove(elem);
-                }
-            }
-            if(!cElements.isEmpty())
-                actions.addUndoAbleAction("DLM"+cElements);
+        } else if (e.getActionCommand() == "Remove All Nodes"){
+            // NEEDS TO REMOVE ALL NODES, not just selected
+            if(!pan.getNodes().isEmpty())
+                actions.addUndoableAction("DLM"+pan.getNodes());
+            pan.clearNodes();
             pan.repaint();
         }
         

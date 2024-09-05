@@ -33,7 +33,7 @@ import java.util.ArrayList;
  * 
  *
  * @author Noah Winn
- * @version 6/25/2024
+ * @version 9/5/2024
  */
 public class EditPopupMenu extends JPopupMenu implements ActionListener
 {
@@ -110,72 +110,46 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
             edit.setVisible(true);
         }
         if(e.getActionCommand() == "Duplicate"){
-            List<Component> frameElements = Arrays.asList(pan.getComponents());
-            if(frameElements.size() < 4096){
-                for(Component elem : frameElements){
-                    if(elem.getForeground() == Color.red){
-                        elem.setForeground(Color.black);
-                        Node p = (Node) elem;
-                        p.setBorder(blackBorder);
-                        Node copy = new Node();
-                        copy.setBounds(p.getBounds());
-                        int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
-                        int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
-                        copy.setLocation(shiftX, shiftY);
-                        copy.setPanel(pan, this);
-                        copy.updateZoom();
-                        pan.add(copy);
-                    }
-                }
+            List<String> cElements = new ArrayList<>();
+            for(Node elem : pan.getSelected()){
+                Node copy = new Node();
+                copy.setBounds(elem.getBounds());
+                int shiftX = copy.getX() + (int)copy.getSize().getWidth()/5;
+                int shiftY = copy.getY() + (int)copy.getSize().getHeight()/5;
+                copy.setLocation(shiftX, shiftY);
+                // may need to do more here since they bunch up when dragged instead of moving regularly, 
+                copy.setPanel(pan, this);
+                copy.updateZoom();
+                copy.setName("#"+pan.getNodeIndex().toString());
+                pan.incrementNodeIndex();
+                cElements.add(copy.toString());
+                pan.add(copy);
             }
+            pan.clearSelected();
+            if(!cElements.isEmpty())
+                actions.addUndoableAction("MKS"+cElements);
             pan.repaint();
         }
         if(e.getActionCommand() == "Copy"){
-            List<Component> frameElements = Arrays.asList(pan.getComponents());
             //Clear clipboard.txt
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
                 // Don't want to take up too much memory
-                if(frameElements.size() < 4096){
-                    for(Component elem : frameElements){
-                        if(elem.getForeground() == Color.red){
-                            Node p = (Node) elem;
-                            p.setBorder(blackBorder);
-                            p.setForeground(Color.black);
-                            out.println(elem);
-                        }
-                    }
-                }
-                pan.repaint();
+                out.println(pan.getSelected());
                 out.close();
+                pan.clearSelected();
+                pan.repaint();
             }
             catch(Exception a){}
         }
         if(e.getActionCommand() == "Cut"){
-            List<Component> frameElements = Arrays.asList(pan.getComponents());
-            List<String> cElements = new ArrayList<>();
             try{
                 PrintWriter out = new PrintWriter("clipboard.txt");
-                if(frameElements.size() < 4096){
-                    for(Component elem : frameElements){
-                        if(elem.getForeground() == Color.red){
-                            cElements.add(((Node)elem).toString());
-                            out.println(elem);
-                        }
-                    }
-                    for(Component elem : frameElements){
-                        if(elem.getForeground() == Color.red){
-                            Node p = (Node) elem;
-                            p.setBorder(blackBorder);
-                            p.setForeground(Color.black);
-                            p.removeConnections();
-                            pan.remove(elem);
-                        }
-                    }
-                }
+                out.println(pan.getSelected());
                 out.close();
-                if(!cElements.isEmpty())
-                    actions.addUndoAbleAction("DLM"+cElements);                
+                if(!pan.getSelected().isEmpty())
+                    actions.addUndoableAction("DLM"+pan.getSelected());
+                pan.sweepSelected();
                 pan.repaint();
             }
             catch(Exception a){}
@@ -207,12 +181,10 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
                         if(!Instant.parse(crd[0]).equals(Instant.parse(crd[3])) 
                             && frameElements.size() < 4096) {
                             boolean none = true;
-                            for(Component elem : frameElements){
-                                if(elem.getClass().equals(Node.class)){
-                                    if(((Node)elem).getUniqueID().equals(Instant.parse(crd[3]))){
-                                        none = false;
-                                        p.setParentNode((Node)elem);
-                                    }
+                            for(Node elem : pan.getNodes()){
+                                if(elem.getUniqueID().equals(Instant.parse(crd[3]))){
+                                    none=false;
+                                    elem.setParentNode(elem);
                                 }
                             }
                             if(none){
@@ -242,13 +214,9 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
                 }
                 scan.close();
                 for(Node nod : connCheck){
-                    List<Component> frameElements = Arrays.asList(pan.getComponents());
-                    for(Component elem : frameElements){
-                        if(elem.getClass().equals(Node.class)){
-                            Node z = (Node)elem;
-                            if(z.getUniqueID().equals(nod.getConnectedNodeID())){
-                                nod.setParentNode(z);
-                            }
+                    for(Node elem : pan.getNodes()){
+                        if(elem.getUniqueID().equals(nod.getConnectedNodeID())){
+                            nod.setParentNode(elem);
                         }
                     }
                 }
@@ -261,14 +229,9 @@ public class EditPopupMenu extends JPopupMenu implements ActionListener
         }
         if(e.getActionCommand() == "Remove Nodes"){
             //DELETES selected nodes
-            List<Component> frameElements = Arrays.asList(pan.getComponents());
-            for(Component elem : frameElements){
-                if(elem.getForeground() == Color.red){
-                    Node p = (Node) elem;
-                    p.removeConnections();
-                    pan.remove(elem);
-                }
-            }
+            if(!pan.getSelected().isEmpty())
+                actions.addUndoableAction("DLM"+pan.getSelected());
+            pan.sweepSelected();
             pan.repaint();
         }
         this.setVisible(false);

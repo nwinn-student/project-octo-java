@@ -13,7 +13,7 @@ import java.awt.Component;
  * edits to be used.
  *
  * @author Noah Winn
- * @version 6/25/2024
+ * @version 9/5/2024
  */
 public class ActionManager {
     private final short MAX_SIZE = 512;
@@ -55,7 +55,6 @@ public class ActionManager {
             redoAbleList.push(undoAbleList.pop());
             doAction(redoAbleList.peek(), true);
         }
-        //System.out.println(undoAbleList+" "+redoAbleList);
     }
     /**
      * Redoes the undone action
@@ -65,12 +64,11 @@ public class ActionManager {
             undoAbleList.push(redoAbleList.pop());
             doAction(undoAbleList.peek(), false);
         }
-        //System.out.println(undoAbleList+" "+redoAbleList);
     }
     /**
      * Adds an action that can be undone/redone.
      */
-    public void addUndoAbleAction(String action){
+    public void addUndoableAction(String action){
         undoAbleList.push(action);
         updateLists();
     }
@@ -82,176 +80,115 @@ public class ActionManager {
          *    mouseRelease, or editting (name, connectedTo, desc, or formulas).
          * Nodes have their own uniqueIDs, so we look for that first.
          */
-        //System.out.println(action);
+        if(action.substring(0,3).equals("MKS")){
+            // Remove / Add
+            makeNodeAction(action, isUndo);
+        } else if (action.substring(0,3).equals("DLM")) {
+            // Add / Remove
+            deleteNodeAction(action, isUndo);
+        } else if (action.substring(0,3).equals("MOV")){
+            // Move back / Move forward
+            moveNodeAction(action, isUndo);
+        } else if(action.substring(0,3).equals("EDT")){
+            // Edit back / Edit forward
+        }
+    }
+    //Make the node(s)
+    private void makeNodeAction(String action, boolean isUndo){
         if(isUndo){
-            if(action.substring(0,3).equals("MKS")){
-                // Removing
-                char[] field = action.substring(3).toCharArray();
-                int i;
-                for(i = 0; i < field.length; i++){
-                    if(field[i] == '['){
-                        break;
-                    }
+            deleteNodeAction(action, !isUndo);
+            return;
+        }
+        List<String> comp = Arrays.asList(action.substring(3,action.length()-1).replaceAll("],","] ,").split(" ,"));
+        List<Node> connCheck = new ArrayList<>();
+        for(String elem : comp){
+            String line = elem.substring(1,elem.length()-1);
+            char[] field = line.toCharArray();
+            int i;
+            for(i = 0; i < field.length; i++){
+                if(field[i] == '['){
+                    break;
                 }
-                action = action.substring(3).substring(i+1, action.substring(3).length()-1);
-                String[] crd = action.split(",");
-                
-                List<Component> frameElements = Arrays.asList(undoAblePanel.getComponents());
-                for(Component elem : frameElements){
-                    if(elem.getClass().equals(Node.class)){
-                        if(((Node)elem).getUniqueID().equals(Instant.parse(crd[0]))){
-                            Node p = (Node) elem;
-                            p.removeConnections();
-                            undoAblePanel.remove(elem);
-                        }
-                    }
-                }
-            } else if (action.substring(0,3).equals("DLM")) {
-                // Adding
-                List<String> comp = Arrays.asList(action.substring(3,action.length()-1).replaceAll("],","] ,").split(" ,"));
-                List<Node> connCheck = new ArrayList<>();
-                for(String elem : comp){
-                    String line = elem.substring(1,elem.length()-1);
-                    char[] field = line.toCharArray();
-                    int i;
-                    for(i = 0; i < field.length; i++){
-                        if(field[i] == '['){
-                            break;
-                        }
-                    }
-                    if(line.substring(0,i).equals("Node")){
-                        Node p = new Node();
-                        p.setPanel(undoAblePanel, popupMenu);
-                        line = line.substring(i+1);
-                        String[] crd = line.split(",");
-                        p.setUniqueID(Instant.parse(crd[0]));
-                        p.setName(crd[1]);
-                        
-                        System.out.println(crd[0] + " : " + crd[3]);
-                        List<Component> frameElements = Arrays.asList(undoAblePanel.getComponents());
-                        if(!Instant.parse(crd[0]).equals(Instant.parse(crd[3])) 
-                            && frameElements.size() < 4096) {
-                            boolean none = true;
-                            for(Component framE : frameElements){
-                                if(elem.getClass().equals(Node.class)){
-                                    if(((Node)framE).getUniqueID().equals(Instant.parse(crd[3]))){
-                                        none = false;
-                                        p.setParentNode((Node)framE);
-                                    }
-                                }
-                            } if(none){
-                                p.setConnectedNodeID(Instant.parse(crd[3]));
-                                connCheck.add(p);
-                            }
-                        }
-                        p.setBounds(
-                            Integer.parseInt(crd[4]),Integer.parseInt(crd[5]),
-                            Integer.parseInt(crd[6]),Integer.parseInt(crd[7])
-                            );
-                        //Formulas...
-                        p.updateZoom();
-                        p.updateConnectionPosition();
-                        undoAblePanel.add(p);
-                    }
-                }
-                for(Node conn : connCheck){
-                    List<Component> frameElements = Arrays.asList(undoAblePanel.getComponents());
-                    for(Component elem : frameElements){
-                        if(elem.getClass().equals(Node.class)){
-                            Node z = (Node)elem;
-                            if(z.getUniqueID().equals(conn.getConnectedNodeID())){
-                                conn.setParentNode(z);
-                            }
-                        }
-                    }
-                }
-            } else if (action.substring(0,3).equals("MOV")){
-                // Move back
             }
+            if(line.substring(0,i).equals("Node")){
+                Node p = new Node();
+                p.setPanel(undoAblePanel, popupMenu);
+                line = line.substring(i+1);
+                String[] crd = line.split(",");
+                p.setUniqueID(Instant.parse(crd[0]));
+                p.setName(crd[1]);
+                
+                //System.out.println(crd[0] + " : " + crd[3]);
+                if(!Instant.parse(crd[0]).equals(Instant.parse(crd[3]))) {
+                    boolean none = true;
+                    for(Node node : undoAblePanel.getNodes()){
+                        if(node.getUniqueID().equals(Instant.parse(crd[3]))){
+                            none=false;
+                            p.setParentNode(node);
+                            // maybe break? since there could be multiple
+                        }
+                    }
+                    if(none){
+                        p.setConnectedNodeID(Instant.parse(crd[3]));
+                        connCheck.add(p);
+                    }
+                }
+                p.setBounds(
+                    Integer.parseInt(crd[4]),Integer.parseInt(crd[5]),
+                    Integer.parseInt(crd[6]),Integer.parseInt(crd[7])
+                    );
+                //Formulas...
+                p.updateZoom();
+                p.updateConnectionPosition();
+                undoAblePanel.add(p);
+            }
+        }
+        for(Node conn : connCheck){
+            for(Node elem : undoAblePanel.getNodes()){
+                if(elem.getUniqueID().equals(conn.getConnectedNodeID())){
+                    conn.setParentNode(elem);
+                }
+            }
+        }
+    }
+    // Removes the node(s)
+    private void deleteNodeAction(String action, boolean isUndo){
+        if(isUndo){
+            makeNodeAction(action, !isUndo);
+            return;
+        }
+        List<String> comp = Arrays.asList(action.substring(3,action.length()-1).replaceAll("],","] ,").split(" ,"));
+        for(String elem : comp){
+            String line = elem.substring(1,elem.length()-1);
+            char[] field = line.toCharArray();
+            int i;
+            for(i = 0; i < field.length; i++){
+                if(field[i] == '['){
+                    break;
+                }
+            }
+            line = line.substring(i+1);
+            String[] crd = line.split(",");
+            Node[] frameElements = undoAblePanel.getNodes().toArray(new Node[undoAblePanel.getNodes().size()]);
+            for(Node node : frameElements){
+                if(node.getUniqueID().equals(Instant.parse(crd[0]))){
+                    undoAblePanel.remove(node); // will error?
+                }
+            }
+        }
+    }
+    private void moveNodeAction(String action, boolean isUndo){
+        if(isUndo){
         
         } else {
-            if(action.substring(0,3).equals("MKS")){
-                // Adding
-                Node connCheck = null;
-                char[] field = action.substring(3).toCharArray();
-                int i;
-                for(i = 0; i < field.length; i++){
-                    if(field[i] == '['){
-                        break;
-                    }
-                }
-                if(action.substring(3).substring(0,i).equals("Node")){
-                    Node p = new Node();
-                    p.setPanel(undoAblePanel, popupMenu);
-                    action = action.substring(3).substring(i+1, action.substring(3).length()-1);
-                    String[] crd = action.split(",");
-                    p.setUniqueID(Instant.parse(crd[0]));
-                    p.setName(crd[1]);
-                    List<Component> frameElements = Arrays.asList(undoAblePanel.getComponents());
-                    if(!Instant.parse(crd[0]).equals(Instant.parse(crd[3])) 
-                        && frameElements.size() < 4096) {
-                        boolean none = true;
-                        for(Component elem : frameElements){
-                            if(elem.getClass().equals(Node.class)){
-                                if(((Node)elem).getUniqueID().equals(Instant.parse(crd[3]))){
-                                    none = false;
-                                    p.setParentNode((Node)elem);
-                                }
-                            }
-                        } if(none){
-                            p.setConnectedNodeID(Instant.parse(crd[3]));
-                            connCheck = p;
-                        }
-                    }
-                    p.setBounds(
-                        Integer.parseInt(crd[4]),Integer.parseInt(crd[5]),
-                        Integer.parseInt(crd[6]),Integer.parseInt(crd[7])
-                        );
-                    //Formulas...
-                    
-                    p.updateZoom();
-                    undoAblePanel.add(p);
-                }
-                if(connCheck != null){
-                    List<Component> frameElements = Arrays.asList(undoAblePanel.getComponents());
-                    for(Component elem : frameElements){
-                        if(elem.getClass().equals(Node.class)){
-                            Node z = (Node)elem;
-                            if(z.getUniqueID().equals(connCheck.getConnectedNodeID())){
-                                connCheck.setParentNode(z);
-                            }
-                        }
-                    }
-                }
-            } else if (action.substring(0,3).equals("DLM")) {
-                // Remove
-                List<String> comp = Arrays.asList(action.substring(3,action.length()-1).replaceAll("],","] ,").split(" ,"));
-                for(String elem : comp){
-                    String line = elem.substring(1,elem.length()-1);
-                    char[] field = line.toCharArray();
-                    int i;
-                    for(i = 0; i < field.length; i++){
-                        if(field[i] == '['){
-                            break;
-                        }
-                    }
-                    line = line.substring(i+1);
-                    String[] crd = line.split(",");
-                    List<Component> frameElements = Arrays.asList(undoAblePanel.getComponents());
-                    for(Component framE : frameElements){
-                        if(framE.getClass().equals(Node.class)){
-                            if(((Node)framE).getUniqueID().equals(Instant.parse(crd[0]))){
-                                Node p = (Node) framE;
-                                p.removeConnections();
-                                undoAblePanel.remove(framE);
-                            }
-                        }
-                    }
-                }
-            } else if (action.substring(0,3).equals("MOV")){
-                // Move forward
-            }
-            
+        
+        }
+    }
+    private void editNodeAction(String action, boolean isUndo){
+        if(isUndo){
+        
+        } else {
+        
         }
     }
 }
