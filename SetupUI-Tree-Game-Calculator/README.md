@@ -38,6 +38,7 @@ A list of features is provided below to provide information about what exists an
 | Feature | How to Use | Explanation |
 | :--- | :--- | :--- |
 | Undo/Redo Action | Click CTRL-Z for Undo and CTRL-Y for Redo | Allows for the user to undo or redo an action performed to a node, such as moving, creating, deleting, and editting.  The undo/redo feature is not like most, in that redo is not wiped after an action is performed. |
+| Select All | Click CTRL-A for Select all | Selects all of the nodes on the screen, for deletion or rearranging |
 | Fullscreen | Click F11 to Fullscreen | Allows the user to enter fullscreen mode, which can be exitted by clicking F11 again |
 
 
